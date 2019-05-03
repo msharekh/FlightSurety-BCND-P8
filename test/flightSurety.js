@@ -40,7 +40,7 @@ contract('Flight Surety Tests', async (accounts) => {
         // let balance = await web3.eth.getBalance(config.flightSuretyApp.address)
         // let balance = await web3.eth.getBalance(config.testAddresses[1])
         let balance = await web3.eth.getBalance("0x68f48429f451934fd1032ba63be0f72eb10424eb")
-        console.log('0x68f', ':	', balance);
+        console.log('0x68f4', ':	', balance);
 
         await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);
     });
@@ -57,6 +57,7 @@ contract('Flight Surety Tests', async (accounts) => {
         assert.equal(status, true, "Incorrect initial operating status value");
 
     });
+
 
     // ==============> (((  2  ))) <==============
     it(`(multiparty) can block access to setOperatingStatus() for non-Contract Owner account`, async function () {
@@ -76,6 +77,8 @@ contract('Flight Surety Tests', async (accounts) => {
 
     // ==============> (((  3  ))) <==============
     it(`(multiparty) can allow access to setOperatingStatus() for Contract Owner account`, async function () {
+        let balance = await web3.eth.getBalance(config.flightSuretyApp.address)
+        console.log(`Owner account: ${config.flightSuretyApp.address}      balance: ${balance}`);
 
         // Ensure that access is allowed for Contract Owner account
         let accessDenied = false;
@@ -89,26 +92,26 @@ contract('Flight Surety Tests', async (accounts) => {
         assert.equal(accessDenied, false, "Access not restricted to Contract Owner");
 
     });
+
+    // ==============> (((  4  ))) <==============
+    it(`(multiparty) can block access to functions using requireIsOperational when operating status is false`, async function () {
+
+        await config.flightSuretyData.setOperatingStatus(false);
+
+        let reverted = false; //this mean transaction will pass
+        try {
+            await config.flightSurety.setTestingMode(true);
+        }
+        catch (e) {
+            reverted = true;
+        }
+        assert.equal(reverted, true, "Access not blocked for requireIsOperational");
+
+        // Set it back for other tests to work
+        await config.flightSuretyData.setOperatingStatus(true);
+
+    });
     /* START COMMENT
-        // ==============> (((  4  ))) <==============
-        it(`(multiparty) can block access to functions using requireIsOperational when operating status is false`, async function () {
-    
-            await config.flightSuretyData.setOperatingStatus(false);
-    
-            let reverted = false; //this mean transaction will pass
-            try {
-                await config.flightSurety.setTestingMode(true);
-            }
-            catch (e) {
-                reverted = true;
-            }
-            assert.equal(reverted, true, "Access not blocked for requireIsOperational");
-    
-            // Set it back for other tests to work
-            await config.flightSuretyData.setOperatingStatus(true);
-    
-        });
-    
         // ==============> (((  5  ))) <==============
         it('(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
     
