@@ -265,3 +265,40 @@ can I debug transaction if I'm using *ganace-cli*?
         // CODE EXERCISE 1: Require registration fee
         /* Enter code here */
         require(msg.value>=REGISTRATION_FEE, "msg value not enough!");
+
+
+
+
+&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&&
+
+PART 1
+
+	AIRLINES:
+	REGISTER AIRLINE
+
+	MULTY-CONSECE
+	 
+	THEN TEST
+
+
+
+PART 2
+	
+	PASSENGERS
+	
+
+
+
+PART 3
+
+	ORACLES:
+	
+
+
+PART 4
+	
+	DATA LIKE DATABASE
+		
+	
+
+PART 5
