@@ -17,7 +17,7 @@ contract('Flight Surety Tests', async (accounts) => {
     /* Operations and Settings                                                              */
     /****************************************************************************************/
 
-    /* (((  1  ))) */
+    // ==============> (((  1  ))) <==============
     it(`(multiparty) has correct initial isOperational() value`, async function () {
 
         // Get operating status
@@ -25,8 +25,12 @@ contract('Flight Surety Tests', async (accounts) => {
         assert.equal(status, true, "Incorrect initial operating status value");
 
     });
-    /* (((  2  ))) */
 
+    /*
+
+    
+
+    // ==============> (((  2  ))) <==============
     it(`(multiparty) can block access to setOperatingStatus() for non-Contract Owner account`, async function () {
 
         // Ensure that access is denied for non-Contract Owner account
@@ -42,7 +46,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
     });
 
-    /* (((  3  ))) */
+    // ==============> (((  3  ))) <==============
     it(`(multiparty) can allow access to setOperatingStatus() for Contract Owner account`, async function () {
 
         // Ensure that access is allowed for Contract Owner account
@@ -58,7 +62,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
     });
 
-    /* (((  4  ))) */
+    // ==============> (((  4  ))) <==============
     it(`(multiparty) can block access to functions using requireIsOperational when operating status is false`, async function () {
 
         await config.flightSuretyData.setOperatingStatus(false);
@@ -77,7 +81,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
     });
 
-    /* (((  5  ))) */
+    // ==============> (((  5  ))) <==============
     it('(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
 
         // ARRANGE
@@ -96,22 +100,25 @@ contract('Flight Surety Tests', async (accounts) => {
         assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
 
     });
-
+    
+     
 
     ////----------------------
 
-    /* (((  6  ))) */
+    // ==============> (((  6  ))) <==============
     //  perform multi-party concensus mechnaism for registering above 4 flights - no multivote results in failure
 
-    /* (((  7  ))) */
+    // ==============> (((  7  ))) <==============
     //  perform multi-party concensus mechnaism for registering above 4 flights - trying multivote works
 
-    /* (((  8  ))) */
+    // ==============> (((  8  ))) <==============
     // passengers can buy insurance
 
-    /* (((  9  ))) */
+    // ==============> (((  9  ))) <==============
     // passenger get paid 1.5X what they paid if flight delayed (CODE 20)
 
-    /* (((  10  ))) */
+    // ==============> (((  10  ))) <==============
     // passengers can withdraw the ether that they were credited!
+
+     */
 });

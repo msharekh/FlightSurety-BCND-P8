@@ -9,13 +9,21 @@ contract FlightSuretyData {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
-    address private contractOwner;                                      // Account used to deploy contract
-    bool private operational = true;                                    // Blocks all state changes throughout the contract if false
+    address private contractOwner;                 // Account used to deploy contract
+    bool private operational = true;               // Blocks all state changes throughout the contract if false
+    
+    // CONSTANTS
+    uint8 private constant AUTHORIZED = 1;
+    uint8 private constant NOT_AUTHORIZED = 0;
+                         
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
 
+    // 1 = Authorized
+    // 2 = NotAuthorized
+    mapping(address => uint256) authorizedCallers;
 
     /**
     * @dev Constructor
@@ -59,6 +67,10 @@ contract FlightSuretyData {
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
     /********************************************************************************************/
+
+    function authorizeCaller(address _address) external{
+        authorizedCallers[_address]=AUTHORIZED;
+    }
 
     /**
     * @dev Get operating status of contract
