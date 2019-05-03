@@ -302,3 +302,7 @@ PART 4
 	
 
 PART 5
+
+---------------------------------------
+currentStatus = await config.flightSuretyData.isOperational();
+        console.log('currentStatus1', ':	', currentStatus);
