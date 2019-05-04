@@ -125,6 +125,16 @@ contract('Flight Surety Tests', async (accounts) => {
 
     });
 
+    it('pre 5...(airline) First airline is registered when contract is deployed.', async () => {
+        let contractOwner = "0x68f48429f451934fd1032ba63be0f72eb10424eb";
+        airlineInfo = await config.flightSuretyData.getAirline(contractOwner);
+        let logs = {
+            isRegistered: airlineInfo[0],
+            isFunded: airlineInfo[1],
+            airlineAddress: airlineInfo[2],
+        }
+        console.table(logs);
+    });
     // ==============> (((  5  ))) <==============
     it('5...(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
 
@@ -161,6 +171,9 @@ contract('Flight Surety Tests', async (accounts) => {
 
     });
 
+    it('6...(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
+
+    });
     /* START COMMENT  
             ////----------------------
        
