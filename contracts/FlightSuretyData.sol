@@ -258,14 +258,21 @@ contract FlightSuretyData {
                             )
                             public
                             payable
+                            
     {
-                // airlines[_address].isFunded=true;
+        require(msg.value>=2000000000000000000, "Airline does not have engough fund");
+             
+        airlines[msg.sender].isFunded=true;
+         
+     }
 
+    function getSentAddress() external view returns(address) {
+        return msg.sender;
     }
  
-    // function getContractBalance() public returns(uint){
-    //     return address(this).balance;
-    // }
+    function getContractBalance() public returns(uint){
+        return address(this).balance;
+    }
 
     function getContractAddress() public view returns(address){
         return address(this);

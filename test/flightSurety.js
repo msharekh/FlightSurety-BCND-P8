@@ -175,8 +175,7 @@ contract('Flight Surety Tests', async (accounts) => {
         // ARRANGE
         let contractOwner  //config.flightSuretyApp.address;
 
-        let contractOwner_balance1
-        let contractOwner_balance2
+
 
         let contract_balance1
         let contract_balance2
@@ -193,42 +192,45 @@ contract('Flight Surety Tests', async (accounts) => {
 
         contractOwner = accounts[0] //config.flightSuretyApp.address;
 
-        // logs = {
-        //     isRegistered: airlineInfo[0],
-        //     isFunded: airlineInfo[1],
-        //     airlineAddress: airlineInfo[2],
-        //     contractOwner_balance: contractOwner_balance
-        // }
-        // console.table(logs);
 
-        airlineInfo = await config.flightSuretyData.getAirline(contractOwner);
+
 
 
         newAirline = accounts[1];
 
         dataContractAddress = await config.flightSuretyData.getContractAddress()
 
-        contractOwner_balance1 = await web3.eth.getBalance(contractOwner)
+
+
         newAirline_balance1 = await web3.eth.getBalance(newAirline)
         contract_balance2 = await await web3.eth.getBalance(dataContractAddress)
 
-        //funding
-        await config.flightSuretyData.fund({ from: newAirline, value: web3.utils.toWei("12", "ether") });
+        let add = await config.flightSuretyData.getSentAddress({ from: newAirline })
+        console.log('add', ':	', add);
 
-        contractOwner_balance2 = await web3.eth.getBalance(contractOwner)
+        //creating 
+        await config.flightSuretyData.createAirline(newAirline, { from: config.firstAirline });
+
+        //funding
+        await config.flightSuretyData.fund({ from: newAirline, value: web3.utils.toWei("2", "ether") });
+
         newAirline_balance2 = await web3.eth.getBalance(newAirline)
         contract_balance2 = await await web3.eth.getBalance(dataContractAddress)
+
+
+        airlineInfo = await config.flightSuretyData.getAirline(newAirline);
 
         logs = {
             newAirline_balance1: newAirline_balance1,
             newAirline_balance2: newAirline_balance2,
-            contractOwner_balance1: contractOwner_balance1,
-            contractOwner_balance2: contractOwner_balance2,
-            contract_balance1: contract_balance1,
-            contract_balance2: contract_balance2
+
+            contract_balance2: contract_balance2,
+
+            isRegistered: airlineInfo[0],
+            isFunded: airlineInfo[1],
+            airlineAddress: airlineInfo[2]
         }
         console.table(logs);
-        // await config.flightSuretyData.createAirline(newAirline, { from: config.firstAirline });
         // // ACT
         // try {
         //     await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
@@ -245,13 +247,7 @@ contract('Flight Surety Tests', async (accounts) => {
         // // // ASSERT
         // assert.equal(result, true, "Airline should not be able to register another airline if it hasn't provided funding");
 
-        // let logs = {
-        //     isRegistered: airlineInfo[0],
-        //     isFunded: airlineInfo[1],
-        //     airlineAddress: airlineInfo[2],
-        //     isAirline: result
-        // }
-        // console.table(logs);
+
     });
     /* START COMMENT  
             ////----------------------
