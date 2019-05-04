@@ -306,3 +306,36 @@ PART 5
 ---------------------------------------
 currentStatus = await config.flightSuretyData.isOperational();
         console.log('currentStatus1', ':	', currentStatus);
+
+
+modifier requireIsFunded( address _address) {
+        require(airlines[_address].isFunded,"This airline is not funded yet!");
+        _;
+    }
+
+        /* mappings */
+
+    /* structs */
+    struct Airline {
+        bool isRegistered;
+        bool isFunded;
+        address airlineAddress;
+    }
+
+
+    mapping(address => Airline) private airlines;
+
+    function createAirline
+                            (  
+                                address _address
+                            )
+                            external                              
+    {
+        airlines[_address].isRegistered = true;
+        airlines[_address].isFunded = false;
+        airlines[_address].airlineAddress=_address;
+    }
+
+    contract FlightSuretyData{
+    function registerAirline ( address _address )  external;
+}

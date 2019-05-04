@@ -86,10 +86,12 @@ contract FlightSuretyData {
     }
 
     function testFunction()
-                            requireIsOperational 
                             public 
+                            requireIsOperational
+                            view 
+                            returns(uint) 
     {
-        //do task
+        return 123;
     }
     /**
     * @dev Sets contract operations on/off

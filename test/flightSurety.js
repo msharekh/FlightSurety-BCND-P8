@@ -123,45 +123,46 @@ contract('Flight Surety Tests', async (accounts) => {
 
 
     });
+
+    // ==============> (((  5  ))) <==============
+    it('5...(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
+
+        // ARRANGE
+        let newAirline = accounts[2];
+        console.log(`config.firstAirline:${config.firstAirline} is registering new Airline: ${newAirline}`);
+
+        // // ACT
+        // try {
+        //     await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
+        // }
+        // catch (e) {
+
+        // }
+        // let result = await config.flightSuretyData.isAirline.call(newAirline);
+
+        // // ASSERT
+        // assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
+
+    });
+
+
     /* START COMMENT  
-        // ==============> (((  5  ))) <==============
-        it('5...(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
-    
-            // ARRANGE
-            let newAirline = accounts[2];
-    
-            // ACT
-            try {
-                await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
-            }
-            catch (e) {
-    
-            }
-            let result = await config.flightSuretyData.isAirline.call(newAirline);
-    
-            // ASSERT
-            assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
-    
-        });
-    
-        
-     
-         ////----------------------
-     
-         // ==============> (((  6  ))) <==============
-         //  6...perform multi-party concensus mechnaism for registering above 4 flights - no multivote results in failure
-     
-         // ==============> (((  7  ))) <==============
-         //  7...perform multi-party concensus mechnaism for registering above 4 flights - trying multivote works
-     
-         // ==============> (((  8  ))) <==============
-         // 8...passengers can buy insurance
-     
-         // ==============> (((  9  ))) <==============
-         // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
-     
-         // ==============> (((  10  ))) <==============
-         // 10...passengers can withdraw the ether that they were credited!
-     
-          */
+       ////----------------------
+   
+       // ==============> (((  6  ))) <==============
+       //  6...perform multi-party concensus mechnaism for registering above 4 flights - no multivote results in failure
+   
+       // ==============> (((  7  ))) <==============
+       //  7...perform multi-party concensus mechnaism for registering above 4 flights - trying multivote works
+   
+       // ==============> (((  8  ))) <==============
+       // 8...passengers can buy insurance
+   
+       // ==============> (((  9  ))) <==============
+       // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
+   
+       // ==============> (((  10  ))) <==============
+       // 10...passengers can withdraw the ether that they were credited!
+   
+        */
 });
