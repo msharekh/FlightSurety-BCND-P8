@@ -41,6 +41,9 @@ contract FlightSuretyData {
         airlines[contractOwner].airlineAddress = contractOwner;
         
         airlinesAdresses.push(contractOwner);
+
+        airlineCount=airlineCount+1;
+
     }
 
     /********************************************************************************************/
@@ -114,7 +117,9 @@ contract FlightSuretyData {
     {
         operational = mode;
     }
-
+    function getContractAddress() public view returns(address){
+        return address(this);
+    }
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
@@ -270,13 +275,9 @@ contract FlightSuretyData {
         return msg.sender;
     }
  
-    function getContractBalance() public returns(uint){
-        return address(this).balance;
-    }
+     
 
-    function getContractAddress() public view returns(address){
-        return address(this);
-    }
+    
 
     function getFlightKey
                         (

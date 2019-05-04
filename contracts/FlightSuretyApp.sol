@@ -12,6 +12,9 @@ import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 contract FlightSuretyApp {
     using SafeMath for uint256; // Allow SafeMath functions to be called for all uint256 types (similar to "prototype" in Javascript)
     FlightSuretyData flightSuretyData;
+
+    uint256 public registeredAirlineCount;
+
     /********************************************************************************************/
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
@@ -79,6 +82,8 @@ contract FlightSuretyApp {
     {
         contractOwner = msg.sender;
         flightSuretyData= FlightSuretyData(dataAddress);
+
+        registeredAirlineCount.add(1);
     }
 
     /********************************************************************************************/
@@ -93,6 +98,9 @@ contract FlightSuretyApp {
         return true;  // Modify to call data contract's status
     }
 
+function getContractAddress() public view returns(address){
+        return address(this);
+    }
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
@@ -109,11 +117,36 @@ contract FlightSuretyApp {
                             external                            
                             returns(bool success, uint256 votes)
     {
-        flightSuretyData.registerAirline(_address);
+        //only if number of airlines is <=4
+
+        if (registeredAirlineCount<4) {
+            flightSuretyData.registerAirline(_address);
+        registeredAirlineCount.add(1);
+        } else {
+            // If the total of votes in favor is greater than 
+            //the 50% of the number of register airlines, then 
+            //the airline is register. 
+            //If not the airline is rejected.
+            
+
+            //get 
+        }
+        
+
         return (success, 0);
     }
 
-
+ 
+    function fund
+                            (   
+                            )
+                            public
+                            payable
+                            
+    {
+        flightSuretyData.fund.value(msg.value)();     
+        // flightSuretyData.call.value(msg.value);  
+     }
    /**
     * @dev Register a future flight for insuring.
     *
@@ -341,4 +374,5 @@ contract FlightSuretyApp {
 
 contract FlightSuretyData{
     function registerAirline ( address _address )  external;
+    function fund ( ) public payable;
 }
