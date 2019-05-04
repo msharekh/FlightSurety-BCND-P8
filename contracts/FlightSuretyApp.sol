@@ -73,12 +73,12 @@ contract FlightSuretyApp {
     */
     constructor
                                 (
-                                    // address _address
+                                    address _address
                                 ) 
                                 public 
     {
         contractOwner = msg.sender;
-        // flightSuretyData= FlightSuretyData(_address);
+        flightSuretyData= FlightSuretyData(_address);
     }
 
     /********************************************************************************************/
