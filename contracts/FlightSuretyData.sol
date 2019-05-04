@@ -259,6 +259,8 @@ contract FlightSuretyData {
                             public
                             payable
     {
+                // airlines[_address].isFunded=true;
+
     }
 
     function getFlightKey
