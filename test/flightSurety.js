@@ -41,7 +41,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
         // let balance = await web3.eth.getBalance(config.flightSuretyApp.address)
         // let balance = await web3.eth.getBalance(config.testAddresses[1])
-        let balance = await web3.eth.getBalance("0x68f48429f45193
+        let balance = await web3.eth.getBalance("0x68f48429f451934fd1032ba63be0f72eb10424eb")
 
         await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);
     });
@@ -128,21 +128,36 @@ contract('Flight Surety Tests', async (accounts) => {
     // ==============> (((  5  ))) <==============
     it('5...(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
 
+
         // ARRANGE
         let newAirline = accounts[2];
-        console.log(`config.firstAirline:${config.firstAirline} is registering new Airline: ${newAirline}`);
+        let airlineInfo;
+
+        await config.flightSuretyData.createAirline(newAirline, { from: config.firstAirline });
+
 
         // ACT
         try {
+
             await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
         }
         catch (e) {
 
         }
-        // let result = await config.flightSuretyData.isAirline.call(newAirline);
+        airlineInfo = await config.flightSuretyData.getAirline(newAirline);
+
+        let result = await config.flightSuretyData.isAirline.call(newAirline);
 
         // // ASSERT
-        // assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
+        assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
+
+        let logs = {
+            isRegistered: airlineInfo[0],
+            isFunded: airlineInfo[1],
+            airlineAddress: airlineInfo[2],
+            isAirline: result
+        }
+        console.table(logs);
 
     });
 

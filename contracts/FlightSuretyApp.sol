@@ -103,12 +103,13 @@ contract FlightSuretyApp {
     *
     */   
     function registerAirline
-                            (   
+                            ( 
+                                address _address  
                             )
-                            external
-                            pure
+                            external                            
                             returns(bool success, uint256 votes)
     {
+        flightSuretyData.registerAirline(_address);
         return (success, 0);
     }
 
@@ -339,5 +340,5 @@ contract FlightSuretyApp {
 }   
 
 contract FlightSuretyData{
-    // function registerAirline ( address _address )  external;
+    function registerAirline ( address _address )  external;
 }

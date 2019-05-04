@@ -35,6 +35,12 @@ contract FlightSuretyData {
                                 public 
     {
         contractOwner = msg.sender;
+
+        airlines[contractOwner].isRegistered = true;
+        airlines[contractOwner].isFunded = true;
+        airlines[contractOwner].airlineAddress = contractOwner;
+        
+        airlinesAdresses.push(contractOwner);
     }
 
     /********************************************************************************************/
@@ -64,6 +70,7 @@ contract FlightSuretyData {
         _;
     }
 
+    
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
     /********************************************************************************************/
@@ -111,18 +118,96 @@ contract FlightSuretyData {
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
+    /* mappings */
+    mapping(address => Airline) private airlines;
 
+    /* structs */
+    struct Airline {
+        bool isRegistered;
+        bool isFunded;
+        address airlineAddress;
+    }
+
+    /* Variables */
+    uint256 public airlineCount;
+    address[] airlinesAdresses;
+
+
+    function createAirline
+                            (  
+                                address _address
+                            )
+                            external                              
+    {
+        airlines[_address].isRegistered = false;
+        airlines[_address].isFunded = false;
+        airlines[_address].airlineAddress=_address;
+
+        airlinesAdresses.push(_address);
+
+    }
+
+    function getAirline
+                    (
+                        address _address
+                    )
+                    external
+                    view                     
+                    returns (bool,bool,address)
+    {
+       
+        return  
+            (
+                airlines[_address].isRegistered,
+                airlines[_address].isFunded,
+                airlines[_address].airlineAddress
+            );
+        
+    }
+
+    function getAirlineCount()  external view returns (uint256)
+    {
+        return airlineCount;
+    }
+
+    function getAirlinesAdresses() external view returns (address[]) {
+         return airlinesAdresses;
+    }
+
+
+    function isAirline
+                    (
+                        address _address
+                    )
+                    external
+                    view                     
+                    returns (bool)
+    {
+        return airlines[_address].isRegistered;
+        
+    }
+
+    modifier requireIsFunded(address _address) {
+        require(airlines[_address].isFunded, "this airline is not funded");
+        _;
+    }
    /**
     * @dev Add an airline to the registration queue
     *      Can only be called from FlightSuretyApp contract
     *
     */   
     function registerAirline
-                            (   
+                            (
+                                address _address     
                             )
-                            external
-                            pure
+                            requireIsFunded(_address)
+                            external      
+                            returns ( bool resutl)                      
     {
+        airlines[_address].isRegistered=true;
+        airlineCount.add(1);
+
+        return airlines[_address].isRegistered;
     }
 
 
