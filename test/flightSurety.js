@@ -225,7 +225,7 @@ contract('Flight Surety Tests', async (accounts) => {
         try {
 
             //funding
-            await config.flightSuretyApp.fund({ from: newAirline, value: web3.utils.toWei("6", "ether") });
+            await config.flightSuretyApp.fund({ from: newAirline, value: web3.utils.toWei("3", "ether") });
 
             //registering
             await config.flightSuretyApp.registerAirline(newAirline, { from: contractOwner });

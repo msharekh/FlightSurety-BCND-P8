@@ -265,7 +265,8 @@ contract FlightSuretyData {
                             payable
                             
     {
-        require(msg.value>=2000000000000000000, "Airline does not have engough fund");
+        // require(msg.value>= 2000000000000000000, "Airline does not have engough fund");
+        require(msg.value>= 2 ether , "Airline does not have engough fund");
              
         airlines[msg.sender].isFunded=true;
          
