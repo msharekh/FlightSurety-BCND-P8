@@ -211,12 +211,24 @@ contract('Flight Surety Tests', async (accounts) => {
         //creating 
         await config.flightSuretyData.createAirline(newAirline, { from: config.firstAirline });
 
-        //funding
-        await config.flightSuretyData.fund({ from: newAirline, value: web3.utils.toWei("2", "ether") });
+
+
+
+        // ACT
+        try {
+
+            //funding
+            await config.flightSuretyData.fund({ from: newAirline, value: web3.utils.toWei("2", "ether") });
+
+            //registering
+            await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
+        }
+        catch (e) {
+
+        }
 
         newAirline_balance2 = await web3.eth.getBalance(newAirline)
         contract_balance2 = await await web3.eth.getBalance(dataContractAddress)
-
 
         airlineInfo = await config.flightSuretyData.getAirline(newAirline);
 
@@ -231,21 +243,11 @@ contract('Flight Surety Tests', async (accounts) => {
             airlineAddress: airlineInfo[2]
         }
         console.table(logs);
-        // // ACT
-        // try {
-        //     await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
 
-        //     await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
-        // }
-        // catch (e) {
+        let result = await config.flightSuretyData.isAirline.call(newAirline);
 
-        // }
-        // airlineInfo = await config.flightSuretyData.getAirline(newAirline);
-
-        // let result = await config.flightSuretyData.isAirline.call(newAirline);
-
-        // // // ASSERT
-        // assert.equal(result, true, "Airline should not be able to register another airline if it hasn't provided funding");
+        // // ASSERT
+        assert.equal(result, true, "Airline should not be able to register another airline if it hasn't provided funding");
 
 
     });
