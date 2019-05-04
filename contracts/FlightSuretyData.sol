@@ -262,6 +262,14 @@ contract FlightSuretyData {
                 // airlines[_address].isFunded=true;
 
     }
+ 
+    // function getContractBalance() public returns(uint){
+    //     return address(this).balance;
+    // }
+
+    function getContractAddress() public view returns(address){
+        return address(this);
+    }
 
     function getFlightKey
                         (
