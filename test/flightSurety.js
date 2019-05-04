@@ -15,20 +15,22 @@ var Web3 = require('web3');
     "0x2f2899d6d35b1a48a4fbdc93a37a72f264a9fca7"  //8
 ]; */
 
-/* 
-Available Accounts
-==================
-(0) 0x68f48429f451934fd1032ba63be0f72eb10424eb (~100 ETH)
-(1) 0x18495d2af425d56005812644136bf68282188aea (~100 ETH)
-(2) 0xc61c9dadd04970bcd7802ecebf758f87b1e35d15 (~100 ETH)
-(3) 0xa513e91f2aaa5ec9b9b4815f44494fb323ae8a08 (~100 ETH)
-(4) 0xd64f959e7f9060e034c0fc9d61c5bc0b71e0d38c (~100 ETH)
-(5) 0x5e432600a3a158fbd90e9bce14089d1551b60007 (~100 ETH)
-(6) 0xd1e7d7e8468e83282f5b506bc57cac3c380e38e9 (~100 ETH)
-(7) 0x6de39a2aad3e1aab5e26d272c749224c39643ac9 (~100 ETH)
-(8) 0xf29001bf5449022cdc7111e2f18d99395f61819c (~100 ETH)
-(9) 0xfbedee2f31462596681a486e6e91f4cf00c69f1f (~100 ETH) 
-*/
+
+// Available Accounts
+// ======================================================
+// Airlines:
+// (0) 0x68f48429f451934fd1032ba63be0f72eb10424eb (~100 ETH)
+// (1) 0x18495d2af425d56005812644136bf68282188aea (~100 ETH)
+// (2) 0xc61c9dadd04970bcd7802ecebf758f87b1e35d15 (~100 ETH)
+// (3) 0xa513e91f2aaa5ec9b9b4815f44494fb323ae8a08 (~100 ETH)
+// (4) 0xd64f959e7f9060e034c0fc9d61c5bc0b71e0d38c (~100 ETH)
+
+// Passengers:
+// (5) 0x5e432600a3a158fbd90e9bce14089d1551b60007 (~100 ETH)
+// (6) 0xd1e7d7e8468e83282f5b506bc57cac3c380e38e9 (~100 ETH)
+// (7) 0x6de39a2aad3e1aab5e26d272c749224c39643ac9 (~100 ETH)
+// (8) 0xf29001bf5449022cdc7111e2f18d99395f61819c (~100 ETH)
+// (9) 0xfbedee2f31462596681a486e6e91f4cf00c69f1f (~100 ETH)
 contract('Flight Surety Tests', async (accounts) => {
 
     var config;
@@ -39,15 +41,14 @@ contract('Flight Surety Tests', async (accounts) => {
 
         // let balance = await web3.eth.getBalance(config.flightSuretyApp.address)
         // let balance = await web3.eth.getBalance(config.testAddresses[1])
-        let balance = await web3.eth.getBalance("0x68f48429f451934fd1032ba63be0f72eb10424eb")
-        console.log('0x68f4', ':	', balance);
+        let balance = await web3.eth.getBalance("0x68f48429f45193
 
         await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);
     });
-
     /****************************************************************************************/
     /* Operations and Settings                                                              */
     /****************************************************************************************/
+
 
     // ==============> (((  1  ))) <==============
     it(`1...(multiparty) has correct initial isOperational() value`, async function () {
@@ -131,13 +132,13 @@ contract('Flight Surety Tests', async (accounts) => {
         let newAirline = accounts[2];
         console.log(`config.firstAirline:${config.firstAirline} is registering new Airline: ${newAirline}`);
 
-        // // ACT
-        // try {
-        //     await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
-        // }
-        // catch (e) {
+        // ACT
+        try {
+            await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
+        }
+        catch (e) {
 
-        // }
+        }
         // let result = await config.flightSuretyData.isAirline.call(newAirline);
 
         // // ASSERT
@@ -145,24 +146,23 @@ contract('Flight Surety Tests', async (accounts) => {
 
     });
 
-
     /* START COMMENT  
-       ////----------------------
-   
-       // ==============> (((  6  ))) <==============
-       //  6...perform multi-party concensus mechnaism for registering above 4 flights - no multivote results in failure
-   
-       // ==============> (((  7  ))) <==============
-       //  7...perform multi-party concensus mechnaism for registering above 4 flights - trying multivote works
-   
-       // ==============> (((  8  ))) <==============
-       // 8...passengers can buy insurance
-   
-       // ==============> (((  9  ))) <==============
-       // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
-   
-       // ==============> (((  10  ))) <==============
-       // 10...passengers can withdraw the ether that they were credited!
-   
-        */
+            ////----------------------
+       
+           // ==============> (((  6  ))) <==============
+           //  6...perform multi-party concensus mechnaism for registering above 4 flights - no multivote results in failure
+       
+           // ==============> (((  7  ))) <==============
+           //  7...perform multi-party concensus mechnaism for registering above 4 flights - trying multivote works
+       
+           // ==============> (((  8  ))) <==============
+           // 8...passengers can buy insurance
+       
+           // ==============> (((  9  ))) <==============
+           // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
+       
+           // ==============> (((  10  ))) <==============
+           // 10...passengers can withdraw the ether that they were credited!
+       
+            */
 });
