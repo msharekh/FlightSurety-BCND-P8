@@ -203,10 +203,12 @@ contract('Flight Surety Tests', async (accounts) => {
         let airline3 = accounts[3];
         // airline2 is only created 
         await config.flightSuretyData.createAirline(airline2, { from: airline1 });
+        await config.flightSuretyData.createAirline(airline3, { from: airline1 });
         // await config.flightSuretyData.createAirline(airline3, { from: airline2 });
         //voting 
-        await config.flightSuretyData.voteAirline(airline1)
-        await config.flightSuretyData.voteAirline(airline2)
+        await config.flightSuretyData.voteAirline(airline3, { from: airline0 })
+        await config.flightSuretyData.voteAirline(airline3, { from: airline1 })
+        await config.flightSuretyData.voteAirline(airline3, { from: airline2 })
         // but is not registed yet, so it is not allowed to register new airline3
         airlineInfo = await config.flightSuretyData.getAirline(airline0);
         logs = {
@@ -214,7 +216,8 @@ contract('Flight Surety Tests', async (accounts) => {
             isRegistered: airlineInfo[0],
             isFunded: airlineInfo[1],
             airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber()
+            voteCount: airlineInfo[3].toNumber(),
+            votes: airlineInfo[4]
         }
         console.table(logs);
         airlineInfo = await config.flightSuretyData.getAirline(airline1);
@@ -223,7 +226,8 @@ contract('Flight Surety Tests', async (accounts) => {
             isRegistered: airlineInfo[0],
             isFunded: airlineInfo[1],
             airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber()
+            voteCount: airlineInfo[3].toNumber(),
+            votes: airlineInfo[4].toString()
         }
         console.table(logs);
         airlineInfo = await config.flightSuretyData.getAirline(airline2);
@@ -232,7 +236,8 @@ contract('Flight Surety Tests', async (accounts) => {
             isRegistered: airlineInfo[0],
             isFunded: airlineInfo[1],
             airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber()
+            voteCount: airlineInfo[3].toNumber(),
+            votes: airlineInfo[4].toString()
         }
         console.table(logs);
         airlineInfo = await config.flightSuretyData.getAirline(airline3);
@@ -241,7 +246,8 @@ contract('Flight Surety Tests', async (accounts) => {
             isRegistered: airlineInfo[0],
             isFunded: airlineInfo[1],
             airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber()
+            voteCount: airlineInfo[3].toNumber(),
+            votes: airlineInfo[4].toString()
         }
         console.table(logs);
         // try {
