@@ -98,7 +98,6 @@ contract FlightSuretyApp {
                             // view                         
                             // returns(bool success, uint256 votes)
     {
-        flightSuretyData.registerAirline(_address);
 
         // success=false;
         // votes=0;
@@ -119,8 +118,10 @@ contract FlightSuretyApp {
             //get the number of votes,3 voteCount
              uint8 voteCount;
              voteCount = flightSuretyData.getVoteCount( _address);
-             
-            if (voteCount > ( registeredAirlineCount /2)){
+            
+            // uint256 minVotes =2;
+            uint256 minVotes = registeredAirlineCount / 2  ;
+            if (voteCount >= minVotes){
             // if (voteCount > 0){
                 flightSuretyData.registerAirline(_address);
                 registeredAirlineCount=registeredAirlineCount+1;
@@ -144,21 +145,45 @@ contract FlightSuretyApp {
              ) 
                 external
                 // view 
-                returns(bool result,uint8 countDuplicates)
+    {
+        var currentVotes = flightSuretyData.getVotes(_address);
+        for (var index = 0; index < currentVotes.length; index++) {
+            // uint countDuplicates ;
+            // if (currentVotes[index] == tx.origin) {
+            //     countDuplicates++;
+            // }  
+            //  require(countDuplicates>1,"This Airline votes before");
+        }
+        //otherwise
+        flightSuretyData.voteAirline(_address);
+
+    }
+
+    function testVoteAirline(                                
+                address _address
+             ) 
+                external
+                view 
+                returns(bool result,uint8 countDuplicates,address duplicateVote)
     {
         result = true;
         countDuplicates = 0;
+        
         var currentVotes = flightSuretyData.getVotes(_address);
-        for (var index = 0; index < currentVotes.length; index++) {
-             require(currentVotes[index]==msg.sender,"This Airline votes before");
+        for (uint8 index = 0; index < currentVotes.length; index++) {
+             require(currentVotes[index]==tx.origin,"This Airline votes before");
              result=false;
              countDuplicates=1;
+             duplicateVote =currentVotes[index];
         }
-        //other wise
-        flightSuretyData.voteAirline(_address);
-
-        return (result,countDuplicates);
+        
+        return (result,countDuplicates,duplicateVote);
     }
+
+    function getRegisteredAirlineCount() external view returns(uint256) {
+        return registeredAirlineCount;
+    }
+
    /**
     * @dev Register a future flight for insuring.
     *

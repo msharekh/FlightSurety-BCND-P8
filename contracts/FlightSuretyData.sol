@@ -129,9 +129,7 @@ contract FlightSuretyData {
         airlines[_address].airlineAddress=_address;
         airlines[_address].voteCount = 0;
         airlinesAdresses.push(_address);
-
         airlineCount=airlineCount+1;
-
     }
     function voteAirline
                             (  
