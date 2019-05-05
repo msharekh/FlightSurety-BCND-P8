@@ -111,6 +111,7 @@ contract FlightSuretyData {
         address airlineAddress;
         uint8 voteCount;
         address[] votes;
+        bool needVotes;
     }
     /* Variables */
     uint256 public airlineCount;
@@ -164,13 +165,16 @@ contract FlightSuretyData {
     {
         return airlines[_address].votes;
     }
+    function setNeedVotesStatus(address _address,bool status) external{
+        airlines[_address].needVotes=status;
+    }
     function getAirline
                     (
                         address _address
                     )
                     external
                     view                     
-                    returns (bool,bool,address,uint8,address[])
+                    returns (bool,bool,address,uint8,address[],bool)
     {
         return  
             (
@@ -178,7 +182,8 @@ contract FlightSuretyData {
                 airlines[_address].isFunded,
                 airlines[_address].airlineAddress,
                 airlines[_address].voteCount,              
-                airlines[_address].votes                
+                airlines[_address].votes,
+                airlines[_address].needVotes             
             );
     }
     function getAirlineCount()  external view returns (uint256)

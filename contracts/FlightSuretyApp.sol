@@ -68,7 +68,7 @@ contract FlightSuretyApp {
     {
         contractOwner = msg.sender;
         flightSuretyData= FlightSuretyData(dataAddress);
-        registeredAirlineCount.add(1);
+        registeredAirlineCount=registeredAirlineCount+1;
     }
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
@@ -94,14 +94,23 @@ contract FlightSuretyApp {
                             ( 
                                 address _address  
                             )
-                            external                            
-                            returns(bool success, uint256 votes)
+                            external   
+                            // view                         
+                            // returns(bool success, uint256 votes)
     {
+        flightSuretyData.registerAirline(_address);
+
+        // success=false;
+        // votes=0;
         //only if number of airlines is <=4
         if (registeredAirlineCount <= AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
             flightSuretyData.registerAirline(_address);
-            registeredAirlineCount.add(1);
-        } else if (registeredAirlineCount > AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
+            registeredAirlineCount=registeredAirlineCount+1;
+            flightSuretyData.setNeedVotesStatus(_address,false);
+        } 
+        if (registeredAirlineCount > AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
+
+            flightSuretyData.setNeedVotesStatus(_address,true);
             // If the total of votes in favor is greater than 
             //the 50% of the number of register airlines, then 
             //the airline is register. 
@@ -110,12 +119,15 @@ contract FlightSuretyApp {
             //get the number of votes,3 voteCount
              uint8 voteCount;
              voteCount = flightSuretyData.getVoteCount( _address);
-            if (voteCount > ( registeredAirlineCount /2)){
-                flightSuretyData.registerAirline(_address);
-                registeredAirlineCount.add(1);
-            }
+             
+            // if (voteCount > ( registeredAirlineCount /2)){
+            //     flightSuretyData.registerAirline(_address);
+            //     registeredAirlineCount=registeredAirlineCount+1;
+                
+                
+            // }
         }
-        return (success, 0);
+        // return (success, votes);
     }
     function fund
                             (   
@@ -330,6 +342,7 @@ contract FlightSuretyData{
     function getVoteCount (address _address ) external  view  returns (uint8);
     function voteAirline( address _address) external;
     function getVotes(address _address) external view returns (address[]);
+    function setNeedVotesStatus(address _address,bool status) external;
 }
 
 // ^\s*$\n

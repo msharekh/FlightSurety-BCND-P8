@@ -155,6 +155,10 @@ contract('Flight Surety Tests', async (accounts) => {
         appContract_balance1 = await web3.eth.getBalance(appContractAddress)
         let add = await config.flightSuretyData.getSentAddress({ from: newAirline })
         console.log('add', ':	', add);
+
+        let airlineCount = await config.flightSuretyData.getAirlineCount();
+        console.log('airlineCount', ':	', airlineCount.toNumber());
+
         //creating 
         await config.flightSuretyData.createAirline(newAirline, { from: contractOwner });
         // ACT
@@ -199,6 +203,7 @@ contract('Flight Surety Tests', async (accounts) => {
         //only registered airline can register new airline
         let airlines = [];
         let balance;
+        let registerResult;
         airlines.push(accounts[0]);
         airlines.push(accounts[1]);
         airlines.push(accounts[2]);
@@ -222,21 +227,21 @@ contract('Flight Surety Tests', async (accounts) => {
         console.log('airlineCount', ':	', airlineCount.toNumber());
 
 
-        for (let i = 0; i < airlineCount.toNumber(); i++) {
-            airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
+        // for (let i = 0; i < airlineCount.toNumber(); i++) {
+        //     airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
 
-            balance = await web3.eth.getBalance(airlines[i])
-            logs = {
-                airline: `A airline ${i}: ${airlines[0]}`,
-                isRegistered: airlineInfo[0],
-                isFunded: airlineInfo[1],
-                airlineAddress: airlineInfo[2],
-                voteCount: airlineInfo[3].toNumber(),
-                votes: airlineInfo[4],
-                balance: balance
-            }
-            console.table(logs);
-        }
+        //     balance = await web3.eth.getBalance(airlines[i])
+        //     logs = {
+        //         airline: `A airline ${i}: ${airlines[0]}`,
+        //         isRegistered: airlineInfo[0],
+        //         isFunded: airlineInfo[1],
+        //         airlineAddress: airlineInfo[2],
+        //         voteCount: airlineInfo[3].toNumber(),
+        //         votes: airlineInfo[4],
+        //         balance: balance
+        //     }
+        //     console.table(logs);
+        // }
 
         for (let i = 2; i < airlineCount.toNumber(); i++) {
             //funding
@@ -245,6 +250,7 @@ contract('Flight Surety Tests', async (accounts) => {
         for (let i = 2; i < airlineCount.toNumber(); i++) {
             //registering
             await config.flightSuretyApp.registerAirline(airlines[i], { from: airlines[1] });
+
         }
 
         for (let i = 0; i < airlineCount.toNumber(); i++) {
@@ -258,6 +264,7 @@ contract('Flight Surety Tests', async (accounts) => {
                 airlineAddress: airlineInfo[2],
                 voteCount: airlineInfo[3].toNumber(),
                 votes: airlineInfo[4],
+                needVotes: airlineInfo[5],
                 balance: balance
             }
             console.table(logs);
