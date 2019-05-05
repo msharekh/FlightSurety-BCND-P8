@@ -216,7 +216,7 @@ contract('Flight Surety Tests', async (accounts) => {
         await config.flightSuretyData.createAirline(airlines[4], { from: airlines[1] });
         await config.flightSuretyData.createAirline(airlines[5], { from: airlines[1] });
         //voting 
-        console.log('airlines[2] vote result', ':	', await config.flightSuretyApp.voteAirline(airlines[2], { from: airlines[0] }));
+        // console.log('airlines[2] vote result', ':	', await config.flightSuretyApp.voteAirline(airlines[2], { from: airlines[0] }));
         // await config.flightSuretyApp.voteAirline(airlines[2], { from: airline0 })
         // await config.flightSuretyApp.voteAirline(airlines[2], { from: airlines[1] })
         // await config.flightSuretyApp.voteAirline(airlines[3], { from: airline0 })
@@ -237,33 +237,49 @@ contract('Flight Surety Tests', async (accounts) => {
         //         isFunded: airlineInfo[1],
         //         airlineAddress: airlineInfo[2],
         //         voteCount: airlineInfo[3].toNumber(),
-        //         votes: airlineInfo[4],
+        //         votes: airlineInfo[4].toString(),
         //         balance: balance
         //     }
         //     console.table(logs);
         // }
 
-        for (let i = 2; i < airlineCount.toNumber(); i++) {
-            //funding
-            await config.flightSuretyApp.fund({ from: airlines[i], value: web3.utils.toWei("3", "ether") });
-        }
-        for (let i = 2; i < airlineCount.toNumber(); i++) {
-            //registering
-            await config.flightSuretyApp.registerAirline(airlines[i], { from: airlines[1] });
+        // for (let i = 2; i < airlineCount.toNumber(); i++) {
+        //     //funding
+        //     await config.flightSuretyApp.fund({ from: airlines[i], value: web3.utils.toWei("3", "ether") });
+        // }
 
-        }
+        //voting
+        // for (let i = 0; i < 4; i++) {
+        //     await config.flightSuretyApp.voteAirline(airlines[4], { from: airlines[i] })
+        // }
+
+        airlineInfo = await config.flightSuretyData.getAirline(airlines[4]);
+        console.log('votes1: airlineInfo[4]', ':	', `: ${airlineInfo[4].toString()}`);
+
+        await config.flightSuretyApp.voteAirline(airlines[4], { from: airlines[2] })
+        // await config.flightSuretyApp.voteAirline(airlines[4], { from: airlines[2] })
+
+        airlineInfo = await config.flightSuretyData.getAirline(airlines[4]);
+        console.log('votes2: airlineInfo[4]', ':	', `: ${airlineInfo[4].toString()}`);
+
+
+        // for (let i = 2; i < airlineCount.toNumber(); i++) {
+        //     //registering
+        //     await config.flightSuretyApp.registerAirline(airlines[i], { from: airlines[1] });
+
+        // }
 
         for (let i = 0; i < airlineCount.toNumber(); i++) {
             airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
 
             balance = await web3.eth.getBalance(airlines[i])
             logs = {
-                airline: `B airline ${i}: ${airlines[0]}`,
+                airline: `B airline ${i}: ${airlines[i]}`,
                 isRegistered: airlineInfo[0],
                 isFunded: airlineInfo[1],
                 airlineAddress: airlineInfo[2],
                 voteCount: airlineInfo[3].toNumber(),
-                votes: airlineInfo[4],
+                votes: airlineInfo[4].toString(),
                 needVotes: airlineInfo[5],
                 balance: balance
             }
@@ -275,7 +291,7 @@ contract('Flight Surety Tests', async (accounts) => {
         //     isFunded: airlineInfo[1],
         //     airlineAddress: airlineInfo[2],
         //     voteCount: airlineInfo[3].toNumber(),
-        //     votes: airlineInfo[4]
+        //     votes: airlineInfo[4].toString()
         // }
         // console.table(logs);
         // airlineInfo = await config.flightSuretyData.getAirline(airlines[1]);

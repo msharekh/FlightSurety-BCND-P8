@@ -142,7 +142,8 @@ contract FlightSuretyData {
         uint8 currentVoteCount = airlines[_address].voteCount;
         airlines[_address].voteCount=currentVoteCount+1;  
         address[] currentVotes=airlines[_address].votes;
-        currentVotes.push(msg.sender);
+        // currentVotes.push(msg.sender);
+        currentVotes.push(tx.origin);
         airlines[_address].votes=currentVotes;  
     }
     function getVoteCount

@@ -120,12 +120,12 @@ contract FlightSuretyApp {
              uint8 voteCount;
              voteCount = flightSuretyData.getVoteCount( _address);
              
-            // if (voteCount > ( registeredAirlineCount /2)){
-            //     flightSuretyData.registerAirline(_address);
-            //     registeredAirlineCount=registeredAirlineCount+1;
-                
-                
-            // }
+            if (voteCount > ( registeredAirlineCount /2)){
+            // if (voteCount > 0){
+                flightSuretyData.registerAirline(_address);
+                registeredAirlineCount=registeredAirlineCount+1;
+                flightSuretyData.setNeedVotesStatus(_address,false);
+            }
         }
         // return (success, votes);
     }
@@ -143,19 +143,19 @@ contract FlightSuretyApp {
                 address _address
              ) 
                 external
-                view 
+                // view 
                 returns(bool result,uint8 countDuplicates)
     {
         result = true;
         countDuplicates = 0;
         var currentVotes = flightSuretyData.getVotes(_address);
         for (var index = 0; index < currentVotes.length; index++) {
-             require(currentVotes[index]==_address,"This Airline votes before");
+             require(currentVotes[index]==msg.sender,"This Airline votes before");
              result=false;
              countDuplicates=1;
         }
         //other wise
-        // flightSuretyData.voteAirline(_address);
+        flightSuretyData.voteAirline(_address);
 
         return (result,countDuplicates);
     }
