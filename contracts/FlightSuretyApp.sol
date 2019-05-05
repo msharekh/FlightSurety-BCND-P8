@@ -126,6 +126,14 @@ contract FlightSuretyApp {
         flightSuretyData.fund.value(msg.value)(msg.sender);     
         // flightSuretyData.call.value(msg.value);  
      }
+
+    function voteAirline(                                
+                address _address
+                ) 
+                external
+    {
+         flightSuretyData.voteAirline(_address);
+    }
    /**
     * @dev Register a future flight for insuring.
     *
@@ -307,4 +315,5 @@ contract FlightSuretyData{
     function registerAirline ( address _address )  external;
     function fund ( address _address ) public payable;
     function getVoteCount (address _address ) external  view  returns (uint8);
+    function voteAirline( address _address) external;
 }

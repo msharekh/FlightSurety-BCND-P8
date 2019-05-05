@@ -30,11 +30,8 @@ contract FlightSuretyData {
         airlines[contractOwner].isFunded = true;
         airlines[contractOwner].airlineAddress = contractOwner;
         airlines[contractOwner].voteCount = 0;
-        
         airlinesAdresses.push(contractOwner);
-
         airlineCount=airlineCount+1;
-
     }
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
@@ -118,6 +115,8 @@ contract FlightSuretyData {
     /* Variables */
     uint256 public airlineCount;
     address[] airlinesAdresses;
+    //modifiers
+    //functions
     function createAirline
                             (  
                                 address _address
@@ -138,7 +137,6 @@ contract FlightSuretyData {
     {
         uint8 currentVoteCount = airlines[_address].voteCount;
         airlines[_address].voteCount=currentVoteCount+1;  
-
         address[] currentVotes=airlines[_address].votes;
         currentVotes.push(msg.sender);
         airlines[_address].votes=currentVotes;  
@@ -177,7 +175,6 @@ contract FlightSuretyData {
     function getAirlinesAdresses() external view returns (address[]) {
          return airlinesAdresses;
     }
-    
     function isAirline
                     (
                         address _address
