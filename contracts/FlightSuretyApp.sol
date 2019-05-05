@@ -129,10 +129,23 @@ contract FlightSuretyApp {
 
     function voteAirline(                                
                 address _address
-                ) 
+             ) 
                 external
+                view 
+                returns(bool result,uint8 countDuplicates)
     {
-         flightSuretyData.voteAirline(_address);
+        result = true;
+        countDuplicates = 0;
+        var currentVotes = flightSuretyData.getVotes(_address);
+        for (var index = 0; index < currentVotes.length; index++) {
+             require(currentVotes[index]==_address,"This Airline votes before");
+             result=false;
+             countDuplicates=1;
+        }
+        //other wise
+        // flightSuretyData.voteAirline(_address);
+
+        return (result,countDuplicates);
     }
    /**
     * @dev Register a future flight for insuring.
@@ -316,4 +329,8 @@ contract FlightSuretyData{
     function fund ( address _address ) public payable;
     function getVoteCount (address _address ) external  view  returns (uint8);
     function voteAirline( address _address) external;
+    function getVotes(address _address) external view returns (address[]);
 }
+
+// ^\s*$\n
+// ^\s*

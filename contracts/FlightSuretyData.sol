@@ -128,6 +128,9 @@ contract FlightSuretyData {
         airlines[_address].airlineAddress=_address;
         airlines[_address].voteCount = 0;
         airlinesAdresses.push(_address);
+
+        airlineCount=airlineCount+1;
+
     }
     function voteAirline
                             (  
@@ -150,6 +153,16 @@ contract FlightSuretyData {
                     returns (uint)
     {
         return airlines[_address].voteCount;
+    }
+    function getVotes
+                    (
+                        address _address
+                    )
+                    external
+                    view                     
+                    returns ( address[] )
+    {
+        return airlines[_address].votes;
     }
     function getAirline
                     (
@@ -203,7 +216,6 @@ contract FlightSuretyData {
                             returns ( bool resutl)                      
     {
         airlines[_address].isRegistered=true;
-        airlineCount.add(1);
         return airlines[_address].isRegistered;
     }
    /**

@@ -197,64 +197,115 @@ contract('Flight Surety Tests', async (accounts) => {
         // (3) 0xa513e91f2aaa5ec9b9b4815f44494fb323ae8a08 (~100 ETH)
         // (4) 0xd64f959e7f9060e034c0fc9d61c5bc0b71e0d38c (~100 ETH)
         //only registered airline can register new airline
-        let airline0 = accounts[0];
-        let airline1 = accounts[1];
-        let airline2 = accounts[2];
-        let airline3 = accounts[3];
-        // airline2 is only created 
-        await config.flightSuretyData.createAirline(airline2, { from: airline1 });
-        await config.flightSuretyData.createAirline(airline3, { from: airline1 });
-        // await config.flightSuretyData.createAirline(airline3, { from: airline2 });
+        let airlines = [];
+        let balance;
+        airlines.push(accounts[0]);
+        airlines.push(accounts[1]);
+        airlines.push(accounts[2]);
+        airlines.push(accounts[3]);
+        airlines.push(accounts[4]);
+        airlines.push(accounts[5]);
+        // airlines only created 
+        await config.flightSuretyData.createAirline(airlines[2], { from: airlines[1] });
+        await config.flightSuretyData.createAirline(airlines[3], { from: airlines[1] });
+        await config.flightSuretyData.createAirline(airlines[4], { from: airlines[1] });
+        await config.flightSuretyData.createAirline(airlines[5], { from: airlines[1] });
         //voting 
-        await config.flightSuretyData.voteAirline(airline3, { from: airline0 })
-        await config.flightSuretyData.voteAirline(airline3, { from: airline1 })
-        await config.flightSuretyData.voteAirline(airline3, { from: airline2 })
-        // but is not registed yet, so it is not allowed to register new airline3
-        airlineInfo = await config.flightSuretyData.getAirline(airline0);
-        logs = {
-            airline0: airline0,
-            isRegistered: airlineInfo[0],
-            isFunded: airlineInfo[1],
-            airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber(),
-            votes: airlineInfo[4]
+        console.log('airlines[2] vote result', ':	', await config.flightSuretyApp.voteAirline(airlines[2], { from: airlines[0] }));
+        // await config.flightSuretyApp.voteAirline(airlines[2], { from: airline0 })
+        // await config.flightSuretyApp.voteAirline(airlines[2], { from: airlines[1] })
+        // await config.flightSuretyApp.voteAirline(airlines[3], { from: airline0 })
+        // await config.flightSuretyApp.voteAirline(airlines[3], { from: airlines[1] })
+        // await config.flightSuretyApp.voteAirline(airlines[3], { from: airlines[2] })
+        // but is not registed yet, so it is not allowed to register new airlines[3]
+        let airlineCount = await config.flightSuretyData.getAirlineCount();
+        console.log('airlineCount', ':	', airlineCount.toNumber());
+
+
+        for (let i = 0; i < airlineCount.toNumber(); i++) {
+            airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
+
+            balance = await web3.eth.getBalance(airlines[i])
+            logs = {
+                airline: `A airline ${i}: ${airlines[0]}`,
+                isRegistered: airlineInfo[0],
+                isFunded: airlineInfo[1],
+                airlineAddress: airlineInfo[2],
+                voteCount: airlineInfo[3].toNumber(),
+                votes: airlineInfo[4],
+                balance: balance
+            }
+            console.table(logs);
         }
-        console.table(logs);
-        airlineInfo = await config.flightSuretyData.getAirline(airline1);
-        logs = {
-            airline1: airline1,
-            isRegistered: airlineInfo[0],
-            isFunded: airlineInfo[1],
-            airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber(),
-            votes: airlineInfo[4].toString()
+
+        for (let i = 2; i < airlineCount.toNumber(); i++) {
+            //funding
+            await config.flightSuretyApp.fund({ from: airlines[i], value: web3.utils.toWei("3", "ether") });
         }
-        console.table(logs);
-        airlineInfo = await config.flightSuretyData.getAirline(airline2);
-        logs = {
-            airline2: airline2,
-            isRegistered: airlineInfo[0],
-            isFunded: airlineInfo[1],
-            airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber(),
-            votes: airlineInfo[4].toString()
+        for (let i = 2; i < airlineCount.toNumber(); i++) {
+            //registering
+            await config.flightSuretyApp.registerAirline(airlines[i], { from: airlines[1] });
         }
-        console.table(logs);
-        airlineInfo = await config.flightSuretyData.getAirline(airline3);
-        logs = {
-            airline3: airline3,
-            isRegistered: airlineInfo[0],
-            isFunded: airlineInfo[1],
-            airlineAddress: airlineInfo[2],
-            voteCount: airlineInfo[3].toNumber(),
-            votes: airlineInfo[4].toString()
+
+        for (let i = 0; i < airlineCount.toNumber(); i++) {
+            airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
+
+            balance = await web3.eth.getBalance(airlines[i])
+            logs = {
+                airline: `B airline ${i}: ${airlines[0]}`,
+                isRegistered: airlineInfo[0],
+                isFunded: airlineInfo[1],
+                airlineAddress: airlineInfo[2],
+                voteCount: airlineInfo[3].toNumber(),
+                votes: airlineInfo[4],
+                balance: balance
+            }
+            console.table(logs);
         }
-        console.table(logs);
+        // logs = {
+        //     airline0: airline0,
+        //     isRegistered: airlineInfo[0],
+        //     isFunded: airlineInfo[1],
+        //     airlineAddress: airlineInfo[2],
+        //     voteCount: airlineInfo[3].toNumber(),
+        //     votes: airlineInfo[4]
+        // }
+        // console.table(logs);
+        // airlineInfo = await config.flightSuretyData.getAirline(airlines[1]);
+        // logs = {
+        //     airline1: airlines[1],
+        //     isRegistered: airlineInfo[0],
+        //     isFunded: airlineInfo[1],
+        //     airlineAddress: airlineInfo[2],
+        //     voteCount: airlineInfo[3].toNumber(),
+        //     votes: airlineInfo[4].toString()
+        // }
+        // console.table(logs);
+        // airlineInfo = await config.flightSuretyData.getAirline(airlines[2]);
+        // logs = {
+        //     airline2: airlines[2],
+        //     isRegistered: airlineInfo[0],
+        //     isFunded: airlineInfo[1],
+        //     airlineAddress: airlineInfo[2],
+        //     voteCount: airlineInfo[3].toNumber(),
+        //     votes: airlineInfo[4].toString()
+        // }
+        // console.table(logs);
+        // airlineInfo = await config.flightSuretyData.getAirline(airlines[3]);
+        // logs = {
+        //     airline3: airlines[3],
+        //     isRegistered: airlineInfo[0],
+        //     isFunded: airlineInfo[1],
+        //     airlineAddress: airlineInfo[2],
+        //     voteCount: airlineInfo[3].toNumber(),
+        //     votes: airlineInfo[4].toString()
+        // }
+        // console.table(logs);
         // try {
-        //     await config.flightSuretyApp.registerAirline(airline3, { from: airline2 });
+        //     await config.flightSuretyApp.registerAirline(airlines[3], { from: airlines[2] });
         // } catch (error) {
         // }
-        // result = await config.flightSuretyData.isAirline(airline3);
+        // result = await config.flightSuretyData.isAirline(airlines[3]);
         // // // ASSERT
         // assert.equal(result, false, "Airline should not be able to register another airline if it is not existing airline");
     });
