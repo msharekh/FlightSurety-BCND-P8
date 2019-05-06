@@ -21,9 +21,9 @@ contract FlightSuretyData {
     *      The deploying account becomes contractOwner
     */
     constructor
-                                (
-                                ) 
-                                public 
+    (
+        ) 
+    public 
     {
         contractOwner = msg.sender;
         airlines[contractOwner].isRegistered = true;
@@ -68,17 +68,17 @@ contract FlightSuretyData {
     * @return A bool that is the current operating status
     */      
     function isOperational() 
-                            public 
-                            view 
-                            returns(bool) 
+    public 
+    view 
+    returns(bool) 
     {
         return operational;
     }
     function testFunction()
-                            public 
-                            requireIsOperational
-                            view 
-                            returns(uint) 
+    public 
+    requireIsOperational
+    view 
+    returns(uint) 
     {
         return 123;
     }
@@ -88,11 +88,11 @@ contract FlightSuretyData {
     * When operational mode is disabled, all write transactions except for this one will fail
     */    
     function setOperatingStatus
-                            (
-                                bool mode
-                            ) 
-                            external
-                            requireContractOwner 
+    (
+        bool mode
+        ) 
+    external
+    requireContractOwner 
     {
         operational = mode;
     }
@@ -122,10 +122,10 @@ contract FlightSuretyData {
     //modifiers
     //functions
     function createAirline
-                            (  
-                                address _address
-                            )
-                            external                              
+    (  
+        address _address
+        )
+    external                              
     {
         airlines[_address].isRegistered = false;
         airlines[_address].isFunded = false;
@@ -135,10 +135,10 @@ contract FlightSuretyData {
         airlineCount=airlineCount+1;
     }
     function voteAirline
-                            (  
-                                address _address
-                            )
-                            external                              
+    (  
+        address _address
+        )
+    external                              
     {
         uint8 currentVoteCount = airlines[_address].voteCount;
         airlines[_address].voteCount=currentVoteCount+1;  
@@ -148,22 +148,22 @@ contract FlightSuretyData {
         airlines[_address].votes=currentVotes;  
     }
     function getVoteCount
-                    (
-                        address _address
-                    )
-                    external
-                    view                     
-                    returns (uint)
+    (
+        address _address
+        )
+    external
+    view                     
+    returns (uint)
     {
         return airlines[_address].voteCount;
     }
     function getVotes
-                    (
-                        address _address
-                    )
-                    external
-                    view                     
-                    returns ( address[] )
+    (
+        address _address
+        )
+    external
+    view                     
+    returns ( address[] )
     {
         return airlines[_address].votes;
     }
@@ -171,21 +171,21 @@ contract FlightSuretyData {
         airlines[_address].needVotes=status;
     }
     function getAirline
-                    (
-                        address _address
-                    )
-                    external
-                    view                     
-                    returns (bool,bool,address,uint8,address[],bool)
+    (
+        address _address
+        )
+    external
+    view                     
+    returns (bool,bool,address,uint8,address[],bool)
     {
         return  
-            (
-                airlines[_address].isRegistered,
-                airlines[_address].isFunded,
-                airlines[_address].airlineAddress,
-                airlines[_address].voteCount,              
-                airlines[_address].votes,
-                airlines[_address].needVotes             
+        (
+            airlines[_address].isRegistered,
+            airlines[_address].isFunded,
+            airlines[_address].airlineAddress,
+            airlines[_address].voteCount,              
+            airlines[_address].votes,
+            airlines[_address].needVotes             
             );
     }
     function getAirlineCount()  external view returns (uint256)
@@ -193,102 +193,89 @@ contract FlightSuretyData {
         return airlineCount;
     }
     function getAirlinesAdresses() external view returns (address[]) {
-         return airlinesAdresses;
-    }
-    function isAirline
-                    (
-                        address _address
-                    )
-                    external
-                    view                     
-                    returns (bool)
-    {
-        return airlines[_address].isRegistered;
-    }
-    modifier requireIsFunded(address _address) {
-        require(airlines[_address].isFunded, "this airline is not funded");
-        _;
-    }
+       return airlinesAdresses;
+   }
+   function isAirline
+   (
+    address _address
+    )
+   external
+   view                     
+   returns (bool)
+   {
+    return airlines[_address].isRegistered;
+}
+modifier requireIsFunded(address _address) {
+    require(airlines[_address].isFunded, "this airline is not funded");
+    _;
+}
     /**
     * @dev Add an airline to the registration queue
     *      Can only be called from FlightSuretyApp contract
     *
     */   
     function registerAirline
-                            (
-                                address _address     
-                            )
-                            requireIsFunded(_address)
-                            external      
-                            returns ( bool resutl)                      
+    (
+        address _address     
+        )
+    requireIsFunded(_address)
+    external      
+    returns ( bool resutl)                      
     {
         airlines[_address].isRegistered=true;
         return airlines[_address].isRegistered;
     }
+   
     
-   /**
-    * @dev Buy insurance for a flight
-    *
-    */   
-    function buy
-                            (                             
-                            )
-                            external
-                            payable
-    {
-    }
-    /* .....................................................................*/
-    /* .............................. Insurances ..............................
-    /* .....................................................................*/
     /**
      *  @dev Credits payouts to insurees
-    */
-    function creditInsurees
-                                (
-                                )
-                                external
-                                pure
-    {
-    }
+     */
+     function creditInsurees
+     (
+        )
+     external
+     pure
+     {
+     }
     /**
      *  @dev Transfers eligible payout funds to insuree
      *
-    */
-    function pay
-                            (
-                            )
-                            external
-                            pure
-    {
-    }
+     */
+     function pay
+     (
+        )
+     external
+     pure
+     {
+     }
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights
     *      resulting in insurance payouts, the contract should be self-sustaining
     *
     */   
     function fund
-                            (   
-                                address _address
-                            )
-                            public
-                            payable
+    (   
+        address _address
+        )
+    public
+    payable
     {
         // require(msg.value>= 2000000000000000000, "Airline does not have engough fund");
         require(msg.value>= 2 ether , "Airline does not have engough fund");
         airlines[_address].isFunded=true;
-     }
+    }
     function getSentAddress() external view returns(address) {
         return msg.sender;
     }
     function getFlightKey
-                        (
-                            address airline,
-                            string memory flight,
-                            uint256 timestamp
-                        )
-                        pure
-                        internal
-                        returns(bytes32) 
+    (
+        address airline,
+        string memory flight,
+        uint256 timestamp
+        )
+    pure
+    internal
+    returns(bytes32) 
     {
         return keccak256(abi.encodePacked(airline, flight, timestamp));
     }
@@ -297,8 +284,8 @@ contract FlightSuretyData {
     *
     */
     function() 
-                            external 
-                            payable 
+    external 
+    payable 
     {
         fund(address(this));
     }
