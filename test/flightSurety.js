@@ -274,6 +274,61 @@ contract('Flight Surety Tests', async (accounts) => {
     //     // // // ASSERT
     //     // assert.equal(result, false, "Airline should not be able to register another airline if it is not existing airline");
     // });
+
+    it('8...Passengers can choose from a fixed list of flight, passengers may pay up to 1 ether for purchasing flight insurance.  ', async () => {
+        let airlines = [];
+        airlines.push(accounts[0]);
+        airlines.push(accounts[1]);
+        airlines.push(accounts[2]);
+        airlines.push(accounts[3]);
+        airlines.push(accounts[4]);
+        airlines.push(accounts[5]);
+        for (let i = 0; i < airlines.length; i++) {
+            // airlines created 
+            await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
+        }
+
+        //passengers
+        let passengers = []
+        passengers.push(accounts[5])
+        passengers.push(accounts[6])
+        passengers.push(accounts[7])
+        for (let i = 0; i < passengers.length; i++) {
+
+            await config.flightSuretyApp.createPassenger(passengers[i])
+        }
+        console.log('passengers:');
+        console.log(await config.flightSuretyApp.getPassengersAdresses());
+        //flights of airline 2
+        for (let i = 1; i <= 3; i++) {
+            await config.flightSuretyApp.createFlight('F00' + i, Math.floor(Date.now() / 1000, 0), airlines[2])
+        }
+        let flights = await config.flightSuretyApp.getFlights();
+
+        // purchasing flights
+        let passenger = passengers[1];
+        let flight = flights[1];
+        console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
+        //to purchase flight passenger should send 1 eth
+        await config.flightSuretyApp.buy(flight, { from: passenger, value: web3.utils.toWei("1", "ether") });
+        flightInfo = await config.flightSuretyApp.getFlight(flight)
+        // bool isRegistered;
+        // uint8 statusCode;
+        // string flightName;
+        // uint256 updatedTimestamp;        
+        // address airline;
+        // bool isInsured;
+        logs = {
+            isRegistered: flightInfo[0],
+            statusCode: flightInfo[1],
+            flightName: flightInfo[2],
+            updatedTimestamp: flightInfo[3],
+            airline: flightInfo[4],
+            isInsured: flightInfo[5]
+        }
+        console.table(logs);
+        console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
+    });
     it('TEST ...  TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...', async () => {
         let airlines = [];
         airlines.push(accounts[0]);
@@ -350,6 +405,8 @@ contract('Flight Surety Tests', async (accounts) => {
         }
         console.table(logs);
         console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
+
+        // when flight status changed 
 
     });
     /* START COMMENT  
