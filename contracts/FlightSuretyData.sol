@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 contract FlightSuretyData {
     using SafeMath for uint256;
@@ -142,7 +142,7 @@ contract FlightSuretyData {
     {
         uint8 currentVoteCount = airlines[_address].voteCount;
         airlines[_address].voteCount=currentVoteCount+1;  
-        address[] currentVotes=airlines[_address].votes;
+        var currentVotes=airlines[_address].votes;
         // currentVotes.push(msg.sender);
         currentVotes.push(tx.origin);
         airlines[_address].votes=currentVotes;  

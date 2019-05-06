@@ -339,3 +339,13 @@ modifier requireIsFunded( address _address) {
     contract FlightSuretyData{
     function registerAirline ( address _address )  external;
 }
+
+
+
+=====
+
+You need to do the following:
+
+In server.js register the oracles
+In server.js handle the OracleRequest events that are emitted when the function fetchFlightStatusfunction is called
+In server.js submit the oracle response calling the function submitOracleResponsefunction in the contracts

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 // It's important to avoid vulnerabilities due to numeric overflow bugs
 // OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
 // More info: https://www.nccgroup.trust/us/about-us/newsroom-and-events/blog/2018/november/smart-contract-insecurity-bad-arithmetic/
@@ -204,6 +204,8 @@ contract FlightSuretyApp {
         uint256 updatedTimestamp;        
         address airline;
         bool isInsured;
+        bool hasStatus;
+        uint8 status;
     }
     mapping(bytes32 => Flight) private flights;
     uint256 public flightsCount;
@@ -230,21 +232,26 @@ contract FlightSuretyApp {
      return flightsList;
  }
  function getFlight(bytes32 key) external view 
- returns(bool,
-    uint8,
-    string,
-    uint256,       
-    address,
-    bool
+ returns(
+    // bool, // 0
+    uint8, // 1
+    string, // 2
+    uint256,   // 3
+    address, // 4
+    // bool, // 5
+    bool, // 6
+    uint8 // 7
     )   
  {
     return(
-        flights[key].isRegistered,
-        flights[key].statusCode,
-        flights[key].flightName,
-        flights[key].updatedTimestamp,        
-        flights[key].airline,
-        flights[key].isInsured
+        // flights[key].isRegistered, // 0
+        flights[key].statusCode, // 1
+        flights[key].flightName, // 2
+        flights[key].updatedTimestamp, // 3
+        flights[key].airline, // 4
+        // flights[key].isInsured, // 5
+        flights[key].hasStatus, //6
+         flights[key].status // 7
         );
 }
 
@@ -296,7 +303,7 @@ contract FlightSuretyApp {
     {
     }
     // Generate a request for oracles to fetch flight information
-    function fetchFlightStatus
+    function fetchFlightStatus    //when button pressed , take 1-airline address and 2-flight name and 3-timestapm
     (
         address airline,
         string flight,
@@ -304,9 +311,10 @@ contract FlightSuretyApp {
         )
     external
     {
-        uint8 index = getRandomIndex(msg.sender);
+        uint8 index = getRandomIndex(msg.sender);  //get random index [1-3]
         // Generate a unique key for storing the request
-        bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp));
+        bytes32 key = keccak256(abi.encodePacked(index, airline, flight, timestamp)); //
+
         oracleResponses[key] = ResponseInfo({
             requester: msg.sender,
             isOpen: true
@@ -359,8 +367,11 @@ contract FlightSuretyApp {
             indexes: indexes
             });
     }
-    function getOracle(address _address) external view returns(uint8[3]){
-        return oracles[msg.sender].indexes;
+    function getOracle(
+            address account
+        ) external view returns(uint8[3]){
+
+        return oracles[account].indexes;
     }
     function getMyIndexes
     (
@@ -447,6 +458,21 @@ contract FlightSuretyApp {
         }
         return random;
     }
+    // Query the status of any flight
+    function viewFlightStatus
+                            (
+                                string flight,
+                                uint256 timestamp
+                            )
+                            external
+                            view
+                            returns(uint8)
+    {
+
+            bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
+            require(flights[flightKey].hasStatus, "Flight status not available");
+            return flights[flightKey].status;
+    }
 // endregion
 }   
 contract FlightSuretyData{
@@ -457,5 +483,5 @@ contract FlightSuretyData{
     function getVotes(address _address) external view returns (address[]);
     function setNeedVotesStatus(address _address,bool status) external;
 }
-// ^\s*$\n
+// flightSuretyApp
 // ^\s*
