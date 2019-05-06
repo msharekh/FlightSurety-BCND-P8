@@ -248,6 +248,9 @@ contract FlightSuretyApp {
         );
 }
 
+// contract.fetchFlightStatus(flight, (error, result) => {
+//                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
+//             });
 /* .....................................................................*/
     /* .............................. Insurances ..............................
     /* .....................................................................*/
@@ -331,7 +334,7 @@ contract FlightSuretyApp {
                                                         // This lets us group responses and identify
                                                         // the response that majority of the oracles
                                                     }
-    // Track all oracle responses
+    // Track all oracle responses 
     // Key = hash(index, flight, timestamp)
     mapping(bytes32 => ResponseInfo) private oracleResponses;
     // Event fired each time an oracle submits a response
@@ -350,11 +353,14 @@ contract FlightSuretyApp {
     {
         // Require registration fee
         require(msg.value >= REGISTRATION_FEE, "Registration fee is required");
-        uint8[3] memory indexes = generateIndexes(msg.sender);
+        uint8[3] memory indexes = generateIndexes(msg.sender); // generate 3 numbers of indexes    
         oracles[msg.sender] = Oracle({
             isRegistered: true,
             indexes: indexes
             });
+    }
+    function getOracle(address _address) external view returns(uint8[3]){
+        return oracles[msg.sender].indexes;
     }
     function getMyIndexes
     (

@@ -36,6 +36,20 @@ contract('Flight Surety Tests', async (accounts) => {
         // let balance = await web3.eth.getBalance(config.testAddresses[1])
         let balance = await web3.eth.getBalance("0x68f48429f451934fd1032ba63be0f72eb10424eb")
         await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);
+
+        // // Watch contract events
+        // const ON_TIME = 10;
+        // let events = config.flightSuretyApp.allEvents();
+        // events.watch((error, result) => {
+        //     if (result.event === 'OracleRequest') {
+        //         console.log(`\n\nOracle Requested: index: ${result.args.index.toNumber()}, flight:  ${result.args.flight}, timestamp: ${result.args.timestamp.toNumber()}`);
+        //     } else {
+        //         console.log(`\n\nFlight Status Available: flight: ${result.args.flight}, timestamp: ${result.args.timestamp.toNumber()}, status: ${result.args.status.toNumber() == ON_TIME ? 'ON TIME' : 'DELAYED'}, verified: ${result.args.verified ? 'VERIFIED' : 'UNVERIFIED'}`);
+        //     }
+        // });
+
+        // // Past events
+        // events.get((error, logs) => { });
     });
     /****************************************************************************************/
     /* Operations and Settings                                                              */
@@ -274,7 +288,6 @@ contract('Flight Surety Tests', async (accounts) => {
     //     // // // ASSERT
     //     // assert.equal(result, false, "Airline should not be able to register another airline if it is not existing airline");
     // });
-
     it('8...Passengers can choose from a fixed list of flight, passengers may pay up to 1 ether for purchasing flight insurance.  ', async () => {
         let airlines = [];
         airlines.push(accounts[0]);
@@ -287,14 +300,12 @@ contract('Flight Surety Tests', async (accounts) => {
             // airlines created 
             await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
         }
-
         //passengers
         let passengers = []
         passengers.push(accounts[5])
         passengers.push(accounts[6])
         passengers.push(accounts[7])
         for (let i = 0; i < passengers.length; i++) {
-
             await config.flightSuretyApp.createPassenger(passengers[i])
         }
         console.log('passengers:');
@@ -304,7 +315,6 @@ contract('Flight Surety Tests', async (accounts) => {
             await config.flightSuretyApp.createFlight('F00' + i, Math.floor(Date.now() / 1000, 0), airlines[2])
         }
         let flights = await config.flightSuretyApp.getFlights();
-
         // purchasing flights
         let passenger = passengers[1];
         let flight = flights[1];
@@ -341,33 +351,12 @@ contract('Flight Surety Tests', async (accounts) => {
             // airlines created 
             await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
         }
-        //     await config.flightSuretyApp.voteAirline(airlines[4], { from: airlines[2] })
-        //     await config.flightSuretyApp.voteAirline(airlines[4], { from: airlines[2] })
-        //     let testVoteAirline1 = await config.flightSuretyApp.testVoteAirline(airlines[4], { from: airlines[2] })
-        //     console.log('testVoteAirline1:');
-        //     console.log(testVoteAirline1);
-        //     airlineInfo = await config.flightSuretyData.getAirline(airlines[4]);
-        //     logs = {
-        //         airline3: airlines[4],
-        //         isRegistered: airlineInfo[0],
-        //         isFunded: airlineInfo[1],
-        //         airlineAddress: airlineInfo[2],
-        //         voteCount: airlineInfo[3].toNumber(),
-        //         votes: airlineInfo[4].toString()
-        //     }
-        //     console.table(logs);
-        // let RegisteredAirlineCount = await config.flightSuretyApp.getRegisteredAirlineCount();
-        // console.log('RegisteredAirlineCount', ':	', RegisteredAirlineCount);
         //passengers
         let passengers = []
         passengers.push(accounts[5])
         passengers.push(accounts[6])
         passengers.push(accounts[7])
         for (let i = 0; i < passengers.length; i++) {
-            // address airline,
-            //                     string flight,
-            //                     uint256 timestamp,
-            //                     uint8 statusCode
             await config.flightSuretyApp.createPassenger(passengers[i])
         }
         console.log('passengers:');
@@ -385,29 +374,66 @@ contract('Flight Surety Tests', async (accounts) => {
         // purchasing flights
         let passenger = passengers[1];
         let flight = flights[1];
-        console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
         //to purchase flight passenger should send 1 eth
         await config.flightSuretyApp.buy(flight, { from: passenger, value: web3.utils.toWei("1", "ether") });
         flightInfo = await config.flightSuretyApp.getFlight(flight)
-        // bool isRegistered;
-        // uint8 statusCode;
-        // string flightName;
-        // uint256 updatedTimestamp;        
-        // address airline;
-        // bool isInsured;
-        logs = {
-            isRegistered: flightInfo[0],
-            statusCode: flightInfo[1],
-            flightName: flightInfo[2],
-            updatedTimestamp: flightInfo[3],
-            airline: flightInfo[4],
-            isInsured: flightInfo[5]
-        }
-        console.table(logs);
-        console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
-
         // when flight status changed 
+        //flights of airline 2
+        // address airline,
+        // string flight,
+        // uint256 timestamp    
+        // let status = await config.flightSuretyApp.fetchFlightStatus(airlines[1], "F00XYZ", Math.floor(Date.now() / 1000, 0))
 
+        // let fee = await config.flightSuretyApp.REGISTRATION_FEE.call();
+
+        // for (let a = 1; a < 10; a++) {
+        //     await config.flightSuretyApp.registerOracle({ from: accounts[0], value: fee });
+        // }
+
+
+
+
+        // ARRANGE
+        flight = 'ND1309'; // Course number
+        let timestamp = Math.floor(Date.now() / 1000);
+
+        // Submit a request for oracles to get status information for a flight
+        await config.flightSuretyApp.fetchFlightStatus(airlines[2], flight, timestamp);
+
+        // ACT
+
+        // Since the Index assigned to each test account is opaque by design
+        // loop through all the accounts and for each account, all its Indexes (indices?)
+        // and submit a response. The contract will reject a submission if it was
+        // not requested so while sub-optimal, it's a good test of that feature
+        for (let a = 1; a < 10; a++) {
+
+            // Get oracle information
+            // For a real contract, we would not want to have this capability
+            // so oracles can remain secret (at least to the extent one doesn't look
+            // in the blockchain data)
+            let oracleIndexes = await config.flightSuretyApp.getOracle(accounts[a]);
+            for (let idx = 0; idx < 3; idx++) {
+
+                try {
+                    // Submit a response...it will only be accepted if there is an Index match
+                    await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx], flight, timestamp, 10, { from: accounts[a] });
+
+                    // Check to see if flight status is available
+                    // Only useful while debugging since flight status is not hydrated until a 
+                    // required threshold of oracles submit a response
+                    let flightStatus = await config.flightSuretyApp.viewFlightStatus(flight, timestamp);
+                    // console.log(1111);
+                    console.log('\nPost', idx, oracleIndexes[idx].toNumber(), flight, timestamp, flightStatus);
+                    // console.log(2222);
+                }
+                catch (e) {
+                    // Enable this when debugging
+                    // console.log('\nError', idx, oracleIndexes[idx].toNumber(), flight, timestamp);
+                }
+
+            }
+        }
     });
     /* START COMMENT  
             ////----------------------
