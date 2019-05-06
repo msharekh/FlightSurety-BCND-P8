@@ -102,6 +102,9 @@ contract FlightSuretyData {
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
+    /* .....................................................................*/
+    /* .............................. Airlines ..............................
+    /* .....................................................................*/
     /* mappings */
     mapping(address => Airline) private airlines;
     /* structs */
@@ -206,7 +209,7 @@ contract FlightSuretyData {
         require(airlines[_address].isFunded, "this airline is not funded");
         _;
     }
-   /**
+    /**
     * @dev Add an airline to the registration queue
     *      Can only be called from FlightSuretyApp contract
     *
@@ -222,6 +225,7 @@ contract FlightSuretyData {
         airlines[_address].isRegistered=true;
         return airlines[_address].isRegistered;
     }
+    
    /**
     * @dev Buy insurance for a flight
     *
@@ -233,6 +237,9 @@ contract FlightSuretyData {
                             payable
     {
     }
+    /* .....................................................................*/
+    /* .............................. Insurances ..............................
+    /* .....................................................................*/
     /**
      *  @dev Credits payouts to insurees
     */

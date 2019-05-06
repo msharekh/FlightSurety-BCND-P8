@@ -22,13 +22,6 @@ contract FlightSuretyApp {
     uint8 private constant STATUS_CODE_LATE_OTHER = 50;
     uint8 private constant AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING = 4;
     address private contractOwner;          // Account used to deploy contract
-    struct Flight {
-        bool isRegistered;
-        uint8 statusCode;
-        uint256 updatedTimestamp;        
-        address airline;
-    }
-    mapping(bytes32 => Flight) private flights;
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
     /********************************************************************************************/
@@ -86,6 +79,9 @@ contract FlightSuretyApp {
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
+    /* .....................................................................*/
+    /* .............................. Airlines ..............................
+    /* .....................................................................*/
    /**
     * @dev Add an airline to the registration queue
     *
@@ -98,7 +94,6 @@ contract FlightSuretyApp {
                             // view                         
                             // returns(bool success, uint256 votes)
     {
-
         // success=false;
         // votes=0;
         //only if number of airlines is <=4
@@ -108,7 +103,6 @@ contract FlightSuretyApp {
             flightSuretyData.setNeedVotesStatus(_address,false);
         } 
         if (registeredAirlineCount > AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
-
             flightSuretyData.setNeedVotesStatus(_address,true);
             // If the total of votes in favor is greater than 
             //the 50% of the number of register airlines, then 
@@ -118,7 +112,6 @@ contract FlightSuretyApp {
             //get the number of votes,3 voteCount
              uint8 voteCount;
              voteCount = flightSuretyData.getVoteCount( _address);
-            
             // uint256 minVotes =2;
             uint256 minVotes = registeredAirlineCount / 2  ;
             if (voteCount >= minVotes){
@@ -139,7 +132,6 @@ contract FlightSuretyApp {
         flightSuretyData.fund.value(msg.value)(msg.sender);     
         // flightSuretyData.call.value(msg.value);  
      }
-
     function voteAirline(                                
                 address _address
              ) 
@@ -147,7 +139,7 @@ contract FlightSuretyApp {
                 // view 
     {
         var currentVotes = flightSuretyData.getVotes(_address);
-        for (var index = 0; index < currentVotes.length; index++) {
+        for (uint8 index = 0; index < currentVotes.length; index++) {
             // uint countDuplicates ;
             // if (currentVotes[index] == tx.origin) {
             //     countDuplicates++;
@@ -156,9 +148,7 @@ contract FlightSuretyApp {
         }
         //otherwise
         flightSuretyData.voteAirline(_address);
-
     }
-
     function testVoteAirline(                                
                 address _address
              ) 
@@ -168,7 +158,6 @@ contract FlightSuretyApp {
     {
         result = true;
         countDuplicates = 0;
-        
         var currentVotes = flightSuretyData.getVotes(_address);
         for (uint8 index = 0; index < currentVotes.length; index++) {
              require(currentVotes[index]==tx.origin,"This Airline votes before");
@@ -176,14 +165,88 @@ contract FlightSuretyApp {
              countDuplicates=1;
              duplicateVote =currentVotes[index];
         }
-        
         return (result,countDuplicates,duplicateVote);
     }
-
     function getRegisteredAirlineCount() external view returns(uint256) {
         return registeredAirlineCount;
     }
-
+    /* .....................................................................*/
+    /* .............................. Passengers ............................
+    /* .....................................................................*/
+   /* mappings */
+    mapping(address => Passenger) private passengers;
+    address[] passengersAdresses;
+    /* structs */
+    struct Passenger {
+        bool isFunded;
+        address passengerAddress;
+     }
+     function createPassenger
+                            (  
+                                address _address 
+                            )
+                            external                              
+    {
+        passengers[_address].passengerAddress=_address;
+        passengersAdresses.push(_address);
+    }
+    function getPassengersAdresses() external view returns (address[]) {
+         return passengersAdresses;
+    }
+    /* .....................................................................*/
+    /* .............................. Flights ..............................
+    /* .....................................................................*/
+     /* Variables */
+     struct Flight {
+        bool isRegistered;
+        uint8 statusCode;
+        string flightName;
+        uint256 updatedTimestamp;        
+        address airline;
+        bool isInsured;
+    }
+    mapping(bytes32 => Flight) private flights;
+    uint256 public flightsCount;
+    bytes32[] flightsList;
+    function createFlight
+                            (                                  
+                                string flightName,
+                                uint256 updatedTimestamp,      
+                                address airline 
+                            )
+                            external                              
+    {
+        bytes32 key = keccak256(abi.encodePacked(airline, updatedTimestamp)); 
+        flights[key].isRegistered=false;
+        flights[key].flightName=flightName;
+        flights[key].statusCode=STATUS_CODE_UNKNOWN;
+        flights[key].updatedTimestamp=updatedTimestamp;
+        flights[key].airline=airline;
+        flights[key].isInsured=false;
+        flightsCount += 1;
+        flightsList.push(key);
+     }
+     function getFlights() external view returns (bytes32[]) {
+         return flightsList;
+    }
+    function getFlight(bytes32 key) external view 
+    returns(bool,
+            uint8,
+            string,
+            uint256,       
+            address,
+            bool
+            )   
+    {
+        return(
+        flights[key].isRegistered,
+        flights[key].statusCode,
+        flights[key].flightName,
+        flights[key].updatedTimestamp,        
+        flights[key].airline,
+        flights[key].isInsured
+        );
+    }
    /**
     * @dev Register a future flight for insuring.
     *
@@ -369,6 +432,5 @@ contract FlightSuretyData{
     function getVotes(address _address) external view returns (address[]);
     function setNeedVotesStatus(address _address,bool status) external;
 }
-
 // ^\s*$\n
 // ^\s*
