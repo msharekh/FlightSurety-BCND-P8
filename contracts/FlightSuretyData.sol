@@ -251,10 +251,13 @@ modifier requireIsFunded(address _address) {
      */
      function pay
      (
+         uint256 refundAmount
         )
      external
      pure
      {
+         // insuree.send(msg.value);
+            refundedBalance[insuree]=refundAmount;
      }
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights
