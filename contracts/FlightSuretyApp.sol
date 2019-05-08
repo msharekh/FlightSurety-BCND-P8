@@ -246,8 +246,20 @@ contract FlightSuretyApp {
     }
     function getFlights() external view returns (bytes32[]) {
      return flightsList;
- }
-function getFlight(bytes32 key) external view 
+    }
+    // function getInsuredFlights() external view returns (bytes32[]) {
+    //     bytes32[] allflights = this.getFlights();
+    //     bytes32[] insuredFlights;
+    //     Flight isInsured;
+    //     for (var i = 0; i < allflights.length; i++) {
+    //         isInsured = this.getFlight(allflights[i]).isInsured;
+    //         // if () {
+    //         //     insuredFlights.push(allflights[i]);
+    //         // }  
+    //     }
+    // return insuredFlights;
+    // }
+    function getFlight(bytes32 key) external view 
     returns(
             bool, // 0
             uint8, // 1

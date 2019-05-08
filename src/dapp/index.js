@@ -162,8 +162,15 @@ import './flightsurety.css';
             debugger;
             //console.log('v', ':	', v);
 
+            // Read transaction getAirlinesAdresses
+            contract.getAirlinesAdresses((error, result) => {
+                ////debugger;
+                //console.log(error, result);
+                updateDDLs("selGetAirlinesAdresses", result, "airline");
 
+            });
 
+            showContactBalanc(contract);
 
 
         }));
@@ -426,6 +433,16 @@ function display(title, description, results) {
     })
     displayDiv.append(section);
 
+}
+
+function showContactBalanc(contract) {
+    contract.getBalance((error, result) => {
+        //debugger;
+        // //console.log(error, result);
+
+        document.getElementById("result-info").innerHTML = result;
+
+    });
 }
 
 
