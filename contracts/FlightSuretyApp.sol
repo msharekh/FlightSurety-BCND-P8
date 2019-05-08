@@ -240,6 +240,20 @@ contract FlightSuretyApp {
         flightSuretyData.creditInsurees(_address);
      }
 
+ function withdraw
+     (      
+         address _address,
+         string flight,
+         uint256 refundAmount,
+         uint256 timestamp
+        )
+        payable
+     external
+     {
+        bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
+ 
+        flightSuretyData.withdraw(_address,refundAmount);
+     }
   
  /* .....................................................................*/
     /* .............................. Flights ..............................
@@ -574,6 +588,13 @@ contract FlightSuretyData{
      (      
          address insuree
          
+        )
+     external
+     payable;
+     function withdraw
+     (      
+         address insuree,
+         uint256 refundAmount
         )
      external
      payable;

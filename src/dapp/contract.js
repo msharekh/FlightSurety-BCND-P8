@@ -207,6 +207,31 @@ export default class Contract {
             });
     }
 
+    withdraw(passengerAddress, flight, amount, callback) {
+        let self = this;
+
+        //if  flight is delayed due to airline fault, passenger receives credit of 1.5X the amount they paid
+
+
+        let payload = {
+            airline: passengerAddress,
+            amount: amount,
+            flight: flight,
+            timestamp: Math.floor(Date.now() / 1000)
+        }
+
+        debugger;
+        // {'value': 6000000000000000000}
+        // window.web3.toWei(1, 'ether')
+        self.flightSuretyApp.methods
+            // .registerAirline(v1, { from: self.owner });
+            .withdraw(passengerAddress, flight, amount)
+            .send({ from: msg.sender, gas: 5555555, value: window.web3.toWei(payload.amount, "ether") }, (error, result) => {
+                debugger
+                callback(error, flight);
+            });
+    }
+
     getFlights(callback) {
         let self = this;
         debugger;

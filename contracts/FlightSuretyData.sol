@@ -245,19 +245,31 @@ modifier requireIsFunded(address _address) {
             // insuree.send(msg.value);
             refundedBalance[insuree]=refundAmount;
      }
+
+     function withdraw
+     (      
+         address insuree,
+         uint256 refundAmount
+        )
+     external
+     payable
+     {
+         insuree.send(msg.value);
+     }
     /**
      *  @dev Transfers eligible payout funds to insuree
      *
      */
      function pay
      (
-         uint256 refundAmount
+            address insuree,
+            uint256 refundAmount
         )
      external
-     pure
+     payable
      {
          // insuree.send(msg.value);
-            refundedBalance[insuree]=refundAmount;
+        refundedBalance[insuree]=refundAmount;
      }
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights

@@ -384,6 +384,20 @@ import './flightsurety.css';
 
         });
     })
+    DOM.elid('withdraw-insurance').addEventListener('click', () => {
+        // let flight = DOM.elid('flight-number').value;
+        let flight = document.getElementById("flight-number").value
+        let passengerAddress = document.querySelector("#selGetAirlinesPassengers").value
+        let amount = 1; // 1 eht
+
+        // Write transaction
+        contract.withdraw(passengerAddress, flight, amount, (error, result) => {
+            display('Oracles', 'Trigger oracles', [{ label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp }]);
+
+
+        });
+    })
+
     /************** register airline ***************/
     // DOM.elid('register-airline').addEventListener('click', () => {
     //     // let _airlineName = DOM.elid('airlineName').value;
