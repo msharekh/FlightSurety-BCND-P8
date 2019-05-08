@@ -24,6 +24,28 @@ app.get('/api', (req, res) => {
   })
 })
 
+c('start of code...................');
+
+flightSuretyApp.methods.getAirlinesAdresses()((error, result) => {
+  console.log(result);
+
+})
+
+// c(flightSuretyApp.methods)
+// contract('Oracles', async (accounts) => {
+//   // c(accounts[0])
+//   // flightSuretyApp.methods.registerOracle({ from: accounts[a], value: fee });
+//   console.log('xxxxx');
+
+// });
+// contract();
+c('end of code...................');
+
+function c(txt) {
+  console.log(txt);
+
+}
+
 export default app;
 
 
