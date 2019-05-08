@@ -247,17 +247,25 @@ contract FlightSuretyApp {
     function getFlights() external view returns (bytes32[]) {
      return flightsList;
  }
- function getFlight(bytes32 key) external view 
-  returns(   
-     address, // 1
-    bool // 2   
-    )   
- {
-    return (   
-        flights[key].airline, // 1
-        flights[key].isInsured // 2    
+function getFlight(bytes32 key) external view 
+    returns(
+            bool, // 0
+            uint8, // 1
+            string, // 2
+            uint256,        // 3
+            address, // 4
+            bool // 5
+            )   
+    {
+        return(
+        flights[key].isRegistered, // 0
+        flights[key].statusCode, // 1
+        flights[key].flightName, // 2
+        flights[key].updatedTimestamp,         // 3
+        flights[key].airline, // 4
+        flights[key].isInsured // 5
         );
-}
+    }
 
 /*  returns(
     bool, // 0

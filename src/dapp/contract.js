@@ -110,15 +110,11 @@ export default class Contract {
         //debugger;
         self.flightSuretyApp.methods
             .getFlight(_key)
-            // .call({ from: self.owner }, callback);
-
-            // .send({ from: self.owner, gas: 5555555 }, (error, result) => {
-            //     callback(error, result);
-            // });
-            .send({ from: self.owner }, (error, result) => {
-                callback(_key);
-            });
-        // .call(_key, callback);
+            .call({ from: self.owner }, callback);
+        // .send({ from: self.owner }, (error, result) => {
+        //     callback(result);
+        // });
+        //     .call({ from: self.owner }, callback);
         // callback();
     }
 

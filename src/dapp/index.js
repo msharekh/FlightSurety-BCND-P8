@@ -162,15 +162,6 @@ import './flightsurety.css';
             debugger;
             //console.log('v', ':	', v);
 
-            // Read transaction getPassengers
-            contract.getFlight(result1, (error, result) => {
-                debugger;
-                let html = `    <h3>Information</h3>
-           
-               <p>airline address:\t\t${result[0]}</p>
-               <p>isInsured:\t\t${result[1]}</p>`
-                document.getElementById("airline-info").innerHTML = html;
-            });
 
 
 
@@ -285,29 +276,37 @@ import './flightsurety.css';
     // get-airline
 
 
-    // DOM.elid('get-flight').addEventListener('click', () => {
-    //     // let _address = DOM.elid('airlineAddress').value;
-    //     let _key = document.querySelector("#selFlights").value
+    DOM.elid('get-flight').addEventListener('click', () => {
+        // let _address = DOM.elid('airlineAddress').value;
+        let _key = document.querySelector("#selFlights").value
 
 
-    //     contract.getFlight(_key, (error, result) => {
-    //         // //debugger;
-    //         //console.log(error, result);
-    //         let html = `<h3>Information</h3>
-    //                     <p>airline:\t\t${result[0].substr(0, 10)}</p>
-    //                     <p>flight:\t\t${result[1]}</p>
-    //                     <p>updatedTimestamp:\t\t${result[2]}</p>
-    //                     <p>statusCode:\t\t${result[3].substr(0, 10)}</p>
-    //                     <p>insured:\t\t${result[4]}</p>`;
-    //         document.getElementById("airline-info").innerHTML = html;
-    //         document.getElementById("flight-number").value = result[1];
+        contract.getFlight(_key, (error, result) => {
+            // //debugger;
+            console.log(error, result);
+            //     flights[key].isRegistered, // 0
+            // flights[key].statusCode, // 1
+            // flights[key].flightName, // 2
+            // flights[key].updatedTimestamp,         // 3
+            // flights[key].airline, // 4
+            // flights[key].isInsured // 5
+            let html = `<h3>Information</h3>
+                        <p>isRegistered:\t\t${result[0]}</p>
+                        <p>statusCode:\t\t${result[1]}</p>
+                        <p>flightName:\t\t${result[2]}</p>
+                        <p>updatedTimestamp:\t\t${result[3]}</p>
+                        <p>airline:\t\t${result[4]}</p>
+                        <p>isInsured:\t\t${result[5]}</p>`
+
+            document.getElementById("airline-info").innerHTML = html;
+            document.getElementById("flight-number").value = result[1];
 
 
-    //     });
-    //     // " airline-info"
+        });
+        // " airline-info"
 
 
-    // });
+    });
     // get-Insurance
     // DOM.elid('get-insurance').addEventListener('click', () => {
     //     // let _address = DOM.elid('airlineAddress').value;
@@ -321,7 +320,7 @@ import './flightsurety.css';
     //         //     Insurances[key].flightKey,
     //         //     Insurances[key].passengerAddress,
     //         //     Insurances[key].isClaimed
-    //         let html = `<h3>Information</h3>
+    //         let html = `< h3 > Information</h3>
     //                     <p>price:\t\t${result[0]}</p>
     //                     <p>flightKey:\t\t${result[1]}</p>
     //                     <p>passengerAddress:\t\t${result[2].substr(0, 10)}</p>
