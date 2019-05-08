@@ -353,6 +353,11 @@ import './flightsurety.css';
         // Write transaction
         contract.fetchFlightStatus(address, flight, (error, result) => {
             display('Oracles', 'Trigger oracles', [{ label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp }]);
+
+            // (flight, callback)
+            contract.viewFlightStatus(flight, (error, result) => {
+                display('Status', 'result from oracles', [{ label: 'View Flight Status', error: error, value: result }]);
+            });
         });
     })
 

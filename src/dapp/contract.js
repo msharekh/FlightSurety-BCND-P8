@@ -265,4 +265,20 @@ export default class Contract {
                 callback(error, payload);
             });
     }
+
+    viewFlightStatus(flight, callback) {
+        let self = this;
+        //TODO: TO CONFIGURE flightSuretyData.fetchFlightStatus
+
+        let payload = {
+
+            flight: flight,
+            timestamp: Math.floor(Date.now() / 1000)
+        }
+        self.flightSuretyApp.methods
+            .viewFlightStatus(payload.flight, payload.timestamp)
+            .send({ from: self.owner }, (error, result) => {
+                callback(error, result);
+            });
+    }
 }

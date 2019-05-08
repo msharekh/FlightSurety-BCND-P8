@@ -344,8 +344,10 @@ contract FlightSuretyApp {
         uint8 statusCode
         )
     internal
-    pure
     {
+        //this will set status to flight
+        bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
+        flights[flightKey].statusCode = statusCode;
     }
     // Generate a request for oracles to fetch flight information
     function fetchFlightStatus    //when button pressed , take 1-airline address and 2-flight name and 3-timestapm
