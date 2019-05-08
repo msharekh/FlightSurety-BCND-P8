@@ -6,8 +6,14 @@ contract('Oracles', async (accounts) => {
 
   const TEST_ORACLES_COUNT = 20;
   var config;
+  // let events = config.flightSuretyApp.allEvents();
+
   before('setup contract', async () => {
     config = await Test.Config(accounts);
+    let events = config.flightSuretyApp.allEvents();
+    console.log('events');
+
+    console.log(events);
 
     // Watch contract events
     const STATUS_CODE_UNKNOWN = 0;
@@ -16,6 +22,8 @@ contract('Oracles', async (accounts) => {
     const STATUS_CODE_LATE_WEATHER = 30;
     const STATUS_CODE_LATE_TECHNICAL = 40;
     const STATUS_CODE_LATE_OTHER = 50;
+
+
 
   });
 
@@ -42,6 +50,7 @@ contract('Oracles', async (accounts) => {
     // Submit a request for oracles to get status information for a flight
     await config.flightSuretyApp.fetchFlightStatus(config.firstAirline, flight, timestamp);
     // ACT
+    console.log(`\n\nOracle Requested: index: ${result[0]}, flight:  ${result[2]}, timestamp: ${result[3]}`);
 
     // Since the Index assigned to each test account is opaque by design
     // loop through all the accounts and for each account, all its Indexes (indices?)

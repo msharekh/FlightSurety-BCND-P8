@@ -229,16 +229,21 @@ modifier requireIsFunded(address _address) {
         return airlines[_address].isRegistered;
     }
    
+   mapping (address => uint256) refundedBalance;
     
     /**
      *  @dev Credits payouts to insurees
      */
      function creditInsurees
-     (
+     (      
+         address insuree,
+         uint256 refundAmount
         )
      external
-     pure
+     payable
      {
+            // insuree.send(msg.value);
+            refundedBalance[insuree]=refundAmount;
      }
     /**
      *  @dev Transfers eligible payout funds to insuree
@@ -264,7 +269,7 @@ modifier requireIsFunded(address _address) {
     payable
     {
         // require(msg.value>= 2000000000000000000, "Airline does not have engough fund");
-        require(msg.value>= 2 ether , "Airline does not have engough fund");
+        require(msg.value>= 10 ether , "Airline does not have engough fund");
         airlines[_address].isFunded=true;
     }
     function getSentAddress() external view returns(address) {

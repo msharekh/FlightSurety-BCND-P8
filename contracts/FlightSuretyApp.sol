@@ -20,6 +20,9 @@ contract FlightSuretyApp {
     uint8 private constant STATUS_CODE_LATE_WEATHER = 30;
     uint8 private constant STATUS_CODE_LATE_TECHNICAL = 40;
     uint8 private constant STATUS_CODE_LATE_OTHER = 50;
+
+    uint8 private constant STATUS_CODE_REFUNDED = 60;
+
     uint8 private constant AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING = 4;
     address private contractOwner;          // Account used to deploy contract
     /********************************************************************************************/
@@ -32,6 +35,7 @@ contract FlightSuretyApp {
     *      This is used on all state changing functions to pause the contract in 
     *      the event there is an issue that needs to be fixed
     */
+ 
     modifier requireIsOperational() 
     {
          // Modify to call data contract's status
@@ -85,11 +89,12 @@ contract FlightSuretyApp {
     /* .....................................................................*/
     /* .............................. Airlines ..............................
     /* .....................................................................*/
-   function createAirline
+   function createAirline 
     (  
         address _address
         // string _airlineName
-        )
+        ) requireIsOperational
+        requireContractOwner
     external{
             // flightSuretyData.createAirline(_address,_airlineName);
             flightSuretyData.createAirline(_address);
@@ -106,6 +111,7 @@ contract FlightSuretyApp {
     ( 
         address _address  
         )
+        requireIsOperational
     external   
                             // view                         
                             // returns(bool success, uint256 votes)
@@ -142,6 +148,7 @@ contract FlightSuretyApp {
     function fund
     (   
         )
+        requireIsOperational
     public
     payable
     {
@@ -196,6 +203,8 @@ contract FlightSuretyApp {
     struct Passenger {
         bool isFunded;
         address passengerAddress;
+        bool isReFunded;
+        uint256 refundAmount;
     }
     function createPassenger
     (  
@@ -209,6 +218,29 @@ contract FlightSuretyApp {
     function getPassengersAdresses() external view returns (address[]) {
      return passengersAdresses;
  }
+
+ /**
+     *  @dev Credits payouts to insurees
+     */
+     function creditInsurees
+     (      
+         address _address,
+         string flight,
+         uint256 refundAmount,
+         uint256 timestamp
+        )
+        payable
+     external
+     {
+        bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
+        flights[flightKey].statusCode = STATUS_CODE_REFUNDED;
+        flights[flightKey].isRefunded = true;
+        flights[flightKey].refundAmount = msg.value;
+
+        flightSuretyData.creditInsurees(_address);
+     }
+
+  
  /* .....................................................................*/
     /* .............................. Flights ..............................
     /* .....................................................................*/
@@ -222,6 +254,8 @@ contract FlightSuretyApp {
         bool isInsured;
         bool hasStatus;
         uint8 status;
+        bool isRefunded;
+        uint256 refundAmount;
     }
     mapping(bytes32 => Flight) private flights;
     uint256 public flightsCount;
@@ -536,6 +570,13 @@ contract FlightSuretyData{
         )
     external;
     function getAirlinesAdresses() external view returns (address[]);
+    function creditInsurees
+     (      
+         address insuree
+         
+        )
+     external
+     payable;
 }
 // flightSuretyApp
 // ^\s*

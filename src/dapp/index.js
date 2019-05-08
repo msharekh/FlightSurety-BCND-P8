@@ -359,8 +359,31 @@ import './flightsurety.css';
                 display('Status', 'result from oracles', [{ label: 'View Flight Status', error: error, value: result }]);
             });
         });
+        // uint8 index,
+        // address airline,
+        // string flight,
+        // uint256 timestamp,
+        // uint8 statusCode
+        let timestamp = Math.floor(Date.now() / 1000);
+
+        contract.submitOracleResponse(result[0], address, flight, timestamp, 10, (error, result) => {
+
+        });
     })
 
+    DOM.elid('refund-passenger').addEventListener('click', () => {
+        // let flight = DOM.elid('flight-number').value;
+        let flight = document.getElementById("flight-number").value
+        let passengerAddress = document.querySelector("#selGetAirlinesPassengers").value
+        let amount = 1; // 1 eht
+
+        // Write transaction
+        contract.creditInsurees(passengerAddress, flight, amount, (error, result) => {
+            display('Oracles', 'Trigger oracles', [{ label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp }]);
+
+
+        });
+    })
     /************** register airline ***************/
     // DOM.elid('register-airline').addEventListener('click', () => {
     //     // let _airlineName = DOM.elid('airlineName').value;

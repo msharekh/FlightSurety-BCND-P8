@@ -160,12 +160,51 @@ export default class Contract {
                 debugger
                 callback(error, flightKey);
             });
+    }
+
+    /**
+     * function creditInsurees
+     (      
+         address _address,
+         string flight,
+         uint256 refundAmount,
+         uint256 timestamp
+        )
+        payable
+     external
+     {
+        bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
+        flights[flightKey].statusCode = STATUS_CODE_REFUNDED;
+        flights[flightKey].isRefunded = true;
+        flights[flightKey].refundAmount = msg.value;
+
+        flightSuretyData.creditInsurees(_address);
+     }
+     * @param {*} callback 
+     */
+    creditInsurees(passengerAddress, flight, amount, callback) {
+        let self = this;
+
+        //if  flight is delayed due to airline fault, passenger receives credit of 1.5X the amount they paid
 
 
+        let payload = {
+            airline: passengerAddress,
+            amount: 1.5 * amount,
+            flight: flight,
+            timestamp: Math.floor(Date.now() / 1000)
+        }
 
-
-        // .registerAirline.call(_airlineAddress, callback(_airlineAddress));
-        //callback(_address);
+        debugger;
+        // {'value': 6000000000000000000}
+        // window.web3.toWei(1, 'ether')
+        self.flightSuretyApp.methods
+            // .registerAirline(v1, { from: self.owner });
+            .creditInsurees(passengerAddress, flight, amount)
+            .send({ from: payload.airline, gas: 5555555, value: window.web3.toWei(payload.amount, "ether") }, (error, result) => {
+                debugger
+                callback(error, flight);
+            });
     }
 
     getFlights(callback) {
