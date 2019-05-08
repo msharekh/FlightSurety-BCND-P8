@@ -115,6 +115,7 @@ contract FlightSuretyData {
         uint8 voteCount;
         address[] votes;
         bool needVotes;
+        string airlineName;
     }
     /* Variables */
     uint256 public airlineCount;
@@ -123,7 +124,8 @@ contract FlightSuretyData {
     //functions
     function createAirline
     (  
-        address _address
+        address _address/* ,
+        string _airlineName */
         )
     external                              
     {
@@ -131,6 +133,7 @@ contract FlightSuretyData {
         airlines[_address].isFunded = false;
         airlines[_address].airlineAddress=_address;
         airlines[_address].voteCount = 0;
+        airlines[_address].airlineName = "AirlineX";
         airlinesAdresses.push(_address);
         airlineCount=airlineCount+1;
     }

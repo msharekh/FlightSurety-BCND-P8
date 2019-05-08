@@ -46,6 +46,9 @@ contract FlightSuretyApp {
         require(msg.sender == contractOwner, "Caller is not contract owner");
         _;
     }
+    function getBalance() public returns(uint){
+        return address(this).balance;
+    }
     /********************************************************************************************/
     /*                                       CONSTRUCTOR                                        */
     /********************************************************************************************/
@@ -82,6 +85,19 @@ contract FlightSuretyApp {
     /* .....................................................................*/
     /* .............................. Airlines ..............................
     /* .....................................................................*/
+   function createAirline
+    (  
+        address _address
+        // string _airlineName
+        )
+    external{
+            // flightSuretyData.createAirline(_address,_airlineName);
+            flightSuretyData.createAirline(_address);
+
+    }
+    function getAirlinesAdresses() external view returns (address[]){
+        return flightSuretyData.getAirlinesAdresses();
+    }
    /**
     * @dev Add an airline to the registration queue
     *
@@ -232,29 +248,38 @@ contract FlightSuretyApp {
      return flightsList;
  }
  function getFlight(bytes32 key) external view 
- returns(
-    // bool, // 0
+  returns(   
+     address, // 1
+    bool // 2   
+    )   
+ {
+    return (   
+        flights[key].airline, // 1
+        flights[key].isInsured // 2    
+        );
+}
+
+/*  returns(
+    bool, // 0
     uint8, // 1
     string, // 2
     uint256,   // 3
     address, // 4
-    // bool, // 5
-    bool, // 6
-    uint8 // 7
+    bool, // 5
+    uint8 // 6
     )   
  {
     return(
-        // flights[key].isRegistered, // 0
+        flights[key].isRegistered, // 0
         flights[key].statusCode, // 1
         flights[key].flightName, // 2
         flights[key].updatedTimestamp, // 3
         flights[key].airline, // 4
-        // flights[key].isInsured, // 5
-        flights[key].hasStatus, //6
-         flights[key].status // 7
+        flights[key].isInsured, // 5
+        flights[key].status // 6
         );
 }
-
+ */
 // contract.fetchFlightStatus(flight, (error, result) => {
 //                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
 //             });
@@ -272,8 +297,8 @@ contract FlightSuretyApp {
     external
     payable
     {
-        flights[key].isRegistered=true;
-        flights[key].isInsured=true;
+        flights[key].isRegistered = true;
+        flights[key].isInsured = true;
     }
 
    /**
@@ -482,6 +507,13 @@ contract FlightSuretyData{
     function voteAirline( address _address) external;
     function getVotes(address _address) external view returns (address[]);
     function setNeedVotesStatus(address _address,bool status) external;
+    function createAirline
+    (  
+        address _address/* ,
+        string _airlineName */
+        )
+    external;
+    function getAirlinesAdresses() external view returns (address[]);
 }
 // flightSuretyApp
 // ^\s*
