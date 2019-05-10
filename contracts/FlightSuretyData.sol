@@ -131,11 +131,11 @@ contract FlightSuretyData {
     {
         airlines[_address].isRegistered = false;
         airlines[_address].isFunded = false;
-        airlines[_address].airlineAddress=_address;
+        airlines[_address].airlineAddress = _address;
         airlines[_address].voteCount = 0;
         airlines[_address].airlineName = "AirlineX";
         airlinesAdresses.push(_address);
-        airlineCount=airlineCount+1;
+        airlineCount=airlineCount + 1;
     }
     function voteAirline
     (  

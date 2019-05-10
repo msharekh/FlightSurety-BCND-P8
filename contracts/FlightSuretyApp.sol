@@ -119,13 +119,17 @@ contract FlightSuretyApp {
         // success=false;
         // votes=0;
         //only if number of airlines is <=4
-        if (registeredAirlineCount <= AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
-            flightSuretyData.registerAirline(_address);
-            registeredAirlineCount=registeredAirlineCount+1;
+        if (registeredAirlineCount < AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
             flightSuretyData.setNeedVotesStatus(_address,false);
+
+            //allow to egister
+            flightSuretyData.registerAirline(_address);
+            registeredAirlineCount = registeredAirlineCount+1;
         } 
         if (registeredAirlineCount > AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
             flightSuretyData.setNeedVotesStatus(_address,true);
+
+            // dont allow to register
             // If the total of votes in favor is greater than 
             //the 50% of the number of register airlines, then 
             //the airline is register. 
@@ -139,7 +143,7 @@ contract FlightSuretyApp {
             if (voteCount >= minVotes){
             // if (voteCount > 0){
                 flightSuretyData.registerAirline(_address);
-                registeredAirlineCount=registeredAirlineCount+1;
+                registeredAirlineCount = registeredAirlineCount + 1;
                 flightSuretyData.setNeedVotesStatus(_address,false);
             }
         }

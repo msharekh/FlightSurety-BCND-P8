@@ -43,8 +43,8 @@ contract('Flight Surety Tests', async (accounts) => {
         const ON_TIME = 10;
         let events = config.flightSuretyApp.allEvents();
 
-        console.log('events', ':	', events);
-        console.log(events);
+        // console.log('events', ':	', events);
+        // console.log(events);
         // events.watch((error, result) => {
         //     if (result.event === 'OracleRequest') {
         //         console.log(`\n\nOracle Requested: index: ${result.args.index.toNumber()}, flight:  ${result.args.flight}, timestamp: ${result.args.timestamp.toNumber()}`);
@@ -65,6 +65,7 @@ contract('Flight Surety Tests', async (accounts) => {
         let status = await config.flightSuretyData.isOperational.call();
         assert.equal(status, true, "Incorrect initial operating status value");
     });
+
     // ==============> (((  2  ))) <==============
     it(`2...(multiparty) can block access to setOperatingStatus() for non-Contract Owner account`, async function () {
         // Ensure that access is denied for non-Contract Owner account
@@ -78,6 +79,7 @@ contract('Flight Surety Tests', async (accounts) => {
         }
         assert.equal(accessDenied, true, "Access not restricted to Contract Owner");
     });
+
     // ==============> (((  3  ))) <==============
     it(`3...(multiparty) can allow access to setOperatingStatus() for Contract Owner account`, async function () {
         let balance = await web3.eth.getBalance(config.flightSuretyApp.address)
@@ -95,6 +97,7 @@ contract('Flight Surety Tests', async (accounts) => {
         // Set it back for other tests to work
         await config.flightSuretyData.setOperatingStatus(true);
     });
+
     // ==============> (((  4  ))) <==============
     it(`4...(multiparty) can block access to functions using requireIsOperational when operating status is false`, async function () {
         let currentStatus;
@@ -115,6 +118,7 @@ contract('Flight Surety Tests', async (accounts) => {
         currentStatus = await config.flightSuretyData.isOperational();
         console.log('currentStatus2', ':	', currentStatus);
     });
+
     it('pre 5...(airline) First airline is registered when contract is deployed.', async () => {
         let contractOwner = "0x68f48429f451934fd1032ba63be0f72eb10424eb";
         airlineInfo = await config.flightSuretyData.getAirline(contractOwner);
@@ -125,6 +129,7 @@ contract('Flight Surety Tests', async (accounts) => {
         }
         console.table(logs);
     });
+
     // ==============> (((  5  ))) <==============
     it('5...(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
         // ARRANGE
@@ -138,17 +143,17 @@ contract('Flight Surety Tests', async (accounts) => {
         catch (e) {
         }
         airlineInfo = await config.flightSuretyData.getAirline(newAirline);
-        let result = await config.flightSuretyData.isAirline.call(newAirline);
-        // // ASSERT
-        assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
         let logs = {
             isRegistered: airlineInfo[0],
             isFunded: airlineInfo[1],
-            airlineAddress: airlineInfo[2],
-            isAirline: result
+            airlineAddress: airlineInfo[2]
         }
-        console.table(logs);
+        // console.table(logs);
+        let result = await config.flightSuretyData.isAirline.call(newAirline);
+        // ASSERT
+        assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
     });
+
     it('6...(airline) can register an Airline using registerAirline() if it is funded', async () => {
         // ARRANGE
         let contractOwner  //config.flightSuretyApp.address;
@@ -177,10 +182,11 @@ contract('Flight Surety Tests', async (accounts) => {
         console.log('airlineCount', ':	', airlineCount.toNumber());
         //creating 
         await config.flightSuretyData.createAirline(newAirline, { from: contractOwner });
+
         // ACT
         try {
             //funding
-            await config.flightSuretyApp.fund({ from: newAirline, value: web3.utils.toWei("3", "ether") });
+            await config.flightSuretyApp.fund({ from: newAirline, value: web3.utils.toWei("10", "ether") });
             //registering
             await config.flightSuretyApp.registerAirline(newAirline, { from: contractOwner });
         }
@@ -190,6 +196,8 @@ contract('Flight Surety Tests', async (accounts) => {
         newAirline_balance2 = await web3.eth.getBalance(newAirline)
         dataContract_balance2 = await web3.eth.getBalance(dataContractAddress)
         appContract_balance2 = await web3.eth.getBalance(appContractAddress)
+
+        //-----------------airlineInfo
         airlineInfo = await config.flightSuretyData.getAirline(newAirline);
         logs = {
             newAirline_balance1: newAirline_balance1,
@@ -203,11 +211,13 @@ contract('Flight Surety Tests', async (accounts) => {
             airlineAddress: airlineInfo[2],
             voteCount: airlineInfo[3].toNumber()
         }
-        console.table(logs);
+        // console.table(logs);
+        //---------------------
         let result = await config.flightSuretyData.isAirline(newAirline);
-        // // ASSERT
+        // ASSERT
         assert.equal(result, true, "Airline should not be able to register another airline if it hasn't provided funding");
     });
+
     it('7...(Multiparty Consensus)--Only existing airline may register a new airline until there are at least four airlines registered  ', async () => {
         // ARRANGE
         // Airlines:
@@ -220,6 +230,10 @@ contract('Flight Surety Tests', async (accounts) => {
         let airlines = [];
         let balance;
         let registerResult;
+        let airlineCount
+        let chResult
+        let creatorAirline
+        let regairlineCount
         airlines.push(accounts[0]);
         airlines.push(accounts[1]);
         airlines.push(accounts[2]);
@@ -228,63 +242,76 @@ contract('Flight Surety Tests', async (accounts) => {
         airlines.push(accounts[5]);
         airlines.push(accounts[6]);
         airlines.push(accounts[7]);
-        // airlines only created 
-        await config.flightSuretyData.createAirline(airlines[2], { from: airlines[1] });
-        await config.flightSuretyData.createAirline(airlines[3], { from: airlines[1] });
-        await config.flightSuretyData.createAirline(airlines[4], { from: airlines[1] });
-        await config.flightSuretyData.createAirline(airlines[5], { from: airlines[1] });
-        await config.flightSuretyData.createAirline(airlines[6], { from: airlines[1] });
-        //voting 
-        // but is not registed yet, so it is not allowed to register new airlines[3]
-        let airlineCount = await config.flightSuretyData.getAirlineCount();
-        console.log('airlineCount', ':	', airlineCount.toNumber());
-        for (let i = 0; i < airlineCount.toNumber(); i++) {
-            airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
-            balance = await web3.eth.getBalance(airlines[i])
-            logs = {
-                airline: `A airline ${i}: ${airlines[0]}`,
-                isRegistered: airlineInfo[0],
-                isFunded: airlineInfo[1],
-                airlineAddress: airlineInfo[2],
-                voteCount: airlineInfo[3].toNumber(),
-                votes: airlineInfo[4].toString(),
-                balance: balance
-            }
-            // console.table(logs);
+        airlines.push(accounts[8]);
+        airlines.push(accounts[9]);
+        airlines.push(accounts[10]);
+        creatorAirline = airlines[1];
+        //check if it is registered
+        chResult = await config.flightSuretyData.isAirline(creatorAirline);
+        console.log('creator Airline registered', ':	', chResult);
+        airlineCount = await config.flightSuretyData.getAirlineCount();
+        console.log('airline Count should be 3', ':	', airlineCount.toNumber());
+        // creating 
+        for (let i = 3; i < 9; i++) {
+            await config.flightSuretyData.createAirline(airlines[i], { from: creatorAirline });
         }
+        // but is not registed yet, so it is not allowed to register new airlines[3]
+        airlineCount = await config.flightSuretyData.getAirlineCount();
+        console.log('airline Count should be 9', ':	', airlineCount.toNumber());
+
         // funding
         for (let i = 2; i < airlineCount.toNumber(); i++) {
-            await config.flightSuretyApp.fund({ from: airlines[i], value: web3.utils.toWei("3", "ether") });
+            await config.flightSuretyApp.fund({ from: airlines[i], value: web3.utils.toWei("10", "ether") });
         }
-        //voting
-        // for (let i = 0; i < 4; i++n) {
-        await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[2] })
-        await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[3] })
-        // await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[4] })
-        // await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[3] })
-        // }
         // registering
         for (let i = 2; i < airlineCount.toNumber(); i++) {
             try {
-                await config.flightSuretyApp.registerAirline(airlines[i], { from: airlines[1] });
+                await config.flightSuretyApp.registerAirline(airlines[i], { from: creatorAirline });
+                airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
+                balance = await web3.eth.getBalance(airlines[i])
+                logs = {
+                    airline: `A airline ${i}: ${airlines[0]}`,
+                    isRegistered: airlineInfo[0],
+                    isFunded: airlineInfo[1],
+                    airlineAddress: airlineInfo[2],
+                    voteCount: airlineInfo[3].toNumber(),
+                    votes: airlineInfo[4].toString(),
+                    balance: balance
+                }
             } catch (error) {
             }
         }
-        for (let i = 0; i < airlineCount.toNumber(); i++) {
-            airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
-            balance = await web3.eth.getBalance(airlines[i])
-            logs = {
-                airline: `B airline ${i}: ${airlines[i]}`,
-                isRegistered: airlineInfo[0],
-                isFunded: airlineInfo[1],
-                airlineAddress: airlineInfo[2],
-                voteCount: airlineInfo[3].toNumber(),
-                votes: airlineInfo[4].toString(),
-                needVotes: airlineInfo[5],
-                balance: balance
-            }
-            console.table(logs);
-        }
+        regairlineCount = await config.flightSuretyApp.getRegisteredAirlineCount();
+        console.log('reg airline Count should be 4', ':	', regairlineCount.toNumber());
+
+        //voting
+
+        await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[2] })
+        await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[3] })
+
+        console.table(logs);
+        // // registering
+        // for (let i = 2; i < airlineCount.toNumber(); i++) {
+        //     try {
+        //         await config.flightSuretyApp.registerAirline(airlines[i], { from: airlines[1] });
+        //     } catch (error) {
+        //     }
+        // }
+        // for (let i = 0; i < airlineCount.toNumber(); i++) {
+        //     airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
+        //     balance = await web3.eth.getBalance(airlines[i])
+        //     logs = {
+        //         airline: `B airline ${i}: ${airlines[i]}`,
+        //         isRegistered: airlineInfo[0],
+        //         isFunded: airlineInfo[1],
+        //         airlineAddress: airlineInfo[2],
+        //         voteCount: airlineInfo[3].toNumber(),
+        //         votes: airlineInfo[4].toString(),
+        //         needVotes: airlineInfo[5],
+        //         balance: balance
+        //     }
+        //     console.table(logs);
+        // }
         // try {
         //     await config.flightSuretyApp.registerAirline(airlines[3], { from: airlines[2] });
         // } catch (error) {
@@ -293,6 +320,7 @@ contract('Flight Surety Tests', async (accounts) => {
         // // // ASSERT
         // assert.equal(result, false, "Airline should not be able to register another airline if it is not existing airline");
     });
+    /*
     it('8...Passengers can choose from a fixed list of flight, passengers may pay up to 1 ether for purchasing flight insurance.  ', async () => {
         let airlines = [];
         airlines.push(accounts[0]);
@@ -385,20 +413,14 @@ contract('Flight Surety Tests', async (accounts) => {
             for (let idx = 0; idx < 3; idx++) {
 
                 try {
-                    /*  uint8 index,
-                       address airline,
-                       string flight,
-                       uint256 timestamp,
-                       uint8 statusCode 
-                       */
+
                     // Submit a response...it will only be accepted if there is an Index match
                     await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx], accounts[0], flight, timestamp, 10, { from: accounts[a] });
 
                     // Check to see if flight status is available
                     // Only useful while debugging since flight status is not hydrated until a 
                     // required threshold of oracles submit a response
-                    /*                     string flight,
-                                        uint256 timestamp */
+
                     let flightStatus = await config.flightSuretyApp.viewFlightStatus(flight, timestamp);
                     console.log('\nPost', idx, oracleIndexes[idx].toNumber(), flight, timestamp, flightStatus);
                 }
@@ -571,14 +593,14 @@ contract('Flight Surety Tests', async (accounts) => {
         // console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
     });
     /* START COMMENT  
-            ////----------------------
-           // ==============> (((  6  ))) <==============
-
-           // ==============> (((  8  ))) <==============
-           // 8...passengers can buy insurance
-           // ==============> (((  9  ))) <==============
-           // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
-           // ==============> (((  10  ))) <==============
-           // 10...passengers can withdraw the ether that they were credited!
-            */
+        ////----------------------
+       // ==============> (((  6  ))) <==============
+    
+       // ==============> (((  8  ))) <==============
+       // 8...passengers can buy insurance
+       // ==============> (((  9  ))) <==============
+       // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
+       // ==============> (((  10  ))) <==============
+       // 10...passengers can withdraw the ether that they were credited!
+        */
 });
