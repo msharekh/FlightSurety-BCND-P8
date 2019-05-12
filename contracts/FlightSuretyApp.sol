@@ -35,7 +35,7 @@ contract FlightSuretyApp {
     *      This is used on all state changing functions to pause the contract in 
     *      the event there is an issue that needs to be fixed
     */
- 
+    
     modifier requireIsOperational() 
     {
          // Modify to call data contract's status
@@ -68,7 +68,7 @@ contract FlightSuretyApp {
     {
         contractOwner = msg.sender;
         flightSuretyData= FlightSuretyData(dataAddress);
-        registeredAirlineCount=registeredAirlineCount+1;
+        registeredAirlineCount = registeredAirlineCount+1;
     }
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
@@ -89,20 +89,20 @@ contract FlightSuretyApp {
     /* .....................................................................*/
     /* .............................. Airlines ..............................
     /* .....................................................................*/
-   function createAirline 
+    function createAirline 
     (  
         address _address
         // string _airlineName
         ) requireIsOperational
-        requireContractOwner
+    requireContractOwner
     external{
             // flightSuretyData.createAirline(_address,_airlineName);
             flightSuretyData.createAirline(_address);
 
-    }
-    function getAirlinesAdresses() external view returns (address[]){
-        return flightSuretyData.getAirlinesAdresses();
-    }
+        }
+        function getAirlinesAdresses() external view returns (address[]){
+            return flightSuretyData.getAirlinesAdresses();
+        }
    /**
     * @dev Add an airline to the registration queue
     *
@@ -110,15 +110,15 @@ contract FlightSuretyApp {
     function registerAirline
     ( 
         address _address  
-        )
+    )
         requireIsOperational
-    external   
-                            // view                         
-                            // returns(bool success, uint256 votes)
-                            {
+        external   
+        // view                         
+        // returns(bool success, uint256 votes)
+        {
         // success=false;
         // votes=0;
-        //only if number of airlines is <=4
+        // only if number of airlines is <=4
         if (registeredAirlineCount < AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
             flightSuretyData.setNeedVotesStatus(_address,false);
 
@@ -126,33 +126,42 @@ contract FlightSuretyApp {
             flightSuretyData.registerAirline(_address);
             registeredAirlineCount = registeredAirlineCount+1;
         } 
-        if (registeredAirlineCount > AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
+        if (registeredAirlineCount >= AIRLINE_COUNT_ACCEPTED_WITHOUT_VOTING) {
             flightSuretyData.setNeedVotesStatus(_address,true);
-
+            
             // dont allow to register
             // If the total of votes in favor is greater than 
-            //the 50% of the number of register airlines, then 
-            //the airline is register. 
-            //If not the airline is rejected.
-            //get the number of airlines, 4 , registeredAirlineCount
-            //get the number of votes,3 voteCount
+            // the 50% of the number of register airlines, then 
+            // the airline is register. 
+            // If not the airline is rejected.
+            // get the number of airlines, 4 , registeredAirlineCount
+            // get the number of votes,3 voteCount
             uint8 voteCount;
             voteCount = flightSuretyData.getVoteCount( _address);
-            // uint256 minVotes =2;
-            uint256 minVotes = registeredAirlineCount / 2  ;
-            if (voteCount >= minVotes){
-            // if (voteCount > 0){
-                flightSuretyData.registerAirline(_address);
-                registeredAirlineCount = registeredAirlineCount + 1;
-                flightSuretyData.setNeedVotesStatus(_address,false);
+            
+            uint minVotes;            
+            minVotes =  registeredAirlineCount / 2;
+
+                if (voteCount >= minVotes){
+                // if (voteCount > 0){
+                    flightSuretyData.registerAirline(_address);
+                    registeredAirlineCount = registeredAirlineCount + 1;
+                    flightSuretyData.setNeedVotesStatus(_address,false);
+                }
             }
-        }
         // return (success, votes);
+    }
+    function getMinVotes(address _address)  external view returns(uint minVotes){
+        // uint voteCount;
+        // voteCount = flightSuretyData.getVoteCount( _address);
+         
+        minVotes =  registeredAirlineCount/2;
+        return minVotes;
     }
     function fund
     (   
         )
-        requireIsOperational
+    requireIsOperational
     public
     payable
     {
@@ -187,14 +196,14 @@ contract FlightSuretyApp {
         countDuplicates = 0;
         var currentVotes = flightSuretyData.getVotes(_address);
         for (uint8 index = 0; index < currentVotes.length; index++) {
-         require(currentVotes[index]==tx.origin,"This Airline votes before");
-         result=false;
-         countDuplicates=1;
-         duplicateVote =currentVotes[index];
-     }
-     return (result,countDuplicates,duplicateVote);
- }
- function getRegisteredAirlineCount() external view returns(uint256) {
+           require(currentVotes[index]==tx.origin,"This Airline votes before");
+           result=false;
+           countDuplicates=1;
+           duplicateVote =currentVotes[index];
+       }
+       return (result,countDuplicates,duplicateVote);
+   }
+   function getRegisteredAirlineCount() external view returns(uint256) {
     return registeredAirlineCount;
 }
 /* .....................................................................*/
@@ -220,20 +229,20 @@ contract FlightSuretyApp {
         passengersAdresses.push(_address);
     }
     function getPassengersAdresses() external view returns (address[]) {
-     return passengersAdresses;
- }
+       return passengersAdresses;
+   }
 
  /**
      *  @dev Credits payouts to insurees
      */
      function creditInsurees
      (      
-         address _address,
-         string flight,
-         uint256 refundAmount,
-         uint256 timestamp
-        )
-        payable
+       address _address,
+       string flight,
+       uint256 refundAmount,
+       uint256 timestamp
+       )
+     payable
      external
      {
         bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
@@ -242,24 +251,24 @@ contract FlightSuretyApp {
         flights[flightKey].refundAmount = msg.value;
 
         flightSuretyData.creditInsurees(_address);
-     }
+    }
 
- function withdraw
-     (      
-         address _address,
-         string flight,
-         uint256 refundAmount,
-         uint256 timestamp
-        )
-        payable
-     external
-     {
+    function withdraw
+    (      
+       address _address,
+       string flight,
+       uint256 refundAmount,
+       uint256 timestamp
+       )
+    payable
+    external
+    {
         bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
- 
+        
         flightSuretyData.withdraw(_address,refundAmount);
-     }
-  
- /* .....................................................................*/
+    }
+    
+    /* .....................................................................*/
     /* .............................. Flights ..............................
     /* .....................................................................*/
     /* Variables */
@@ -297,8 +306,8 @@ contract FlightSuretyApp {
         flightsList.push(key);
     }
     function getFlights() external view returns (bytes32[]) {
-     return flightsList;
-    }
+       return flightsList;
+   }
     // function getInsuredFlights() external view returns (bytes32[]) {
     //     bytes32[] allflights = this.getFlights();
     //     bytes32[] insuredFlights;
@@ -351,7 +360,7 @@ contract FlightSuretyApp {
         flights[key].status // 6
         );
 }
- */
+*/
 // contract.fetchFlightStatus(flight, (error, result) => {
 //                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
 //             });
@@ -363,8 +372,8 @@ contract FlightSuretyApp {
     *
     */   
     function buy
-        (      
-            bytes32 key                    
+    (      
+        bytes32 key                    
         )
     external
     payable
@@ -467,7 +476,7 @@ contract FlightSuretyApp {
             });
     }
     function getOracle(
-            address account
+        address account
         ) external view returns(uint8[3]){
 
         return oracles[account].indexes;
@@ -559,18 +568,18 @@ contract FlightSuretyApp {
     }
     // Query the status of any flight
     function viewFlightStatus
-                            (
-                                string flight,
-                                uint256 timestamp
-                            )
-                            external
-                            view
-                            returns(uint8)
+    (
+        string flight,
+        uint256 timestamp
+        )
+    external
+    view
+    returns(uint8)
     {
 
-            bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
-            require(flights[flightKey].hasStatus, "Flight status not available");
-            return flights[flightKey].status;
+        bytes32 flightKey = keccak256(abi.encodePacked(flight, timestamp));
+        require(flights[flightKey].hasStatus, "Flight status not available");
+        return flights[flightKey].status;
     }
 // endregion
 }   
@@ -589,19 +598,19 @@ contract FlightSuretyData{
     external;
     function getAirlinesAdresses() external view returns (address[]);
     function creditInsurees
-     (      
-         address insuree
-         
-        )
-     external
-     payable;
-     function withdraw
-     (      
-         address insuree,
-         uint256 refundAmount
-        )
-     external
-     payable;
+    (      
+       address insuree
+       
+       )
+    external
+    payable;
+    function withdraw
+    (      
+       address insuree,
+       uint256 refundAmount
+       )
+    external
+    payable;
 }
 // flightSuretyApp
 // ^\s*

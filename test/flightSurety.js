@@ -233,7 +233,11 @@ contract('Flight Surety Tests', async (accounts) => {
         let airlineCount
         let chResult
         let creatorAirline
-        let regairlineCount
+        let regAirlineCount
+        let votedAirline
+        let lastReg
+        let voteCount
+        let minVotes
         airlines.push(accounts[0]);
         airlines.push(accounts[1]);
         airlines.push(accounts[2]);
@@ -250,21 +254,24 @@ contract('Flight Surety Tests', async (accounts) => {
         chResult = await config.flightSuretyData.isAirline(creatorAirline);
         console.log('creator Airline registered', ':	', chResult);
         airlineCount = await config.flightSuretyData.getAirlineCount();
-        console.log('airline Count should be 3', ':	', airlineCount.toNumber());
+        console.log('airline Count before should be 3', ':	', airlineCount.toNumber());
         // creating 
         for (let i = 3; i < 9; i++) {
             await config.flightSuretyData.createAirline(airlines[i], { from: creatorAirline });
         }
         // but is not registed yet, so it is not allowed to register new airlines[3]
         airlineCount = await config.flightSuretyData.getAirlineCount();
-        console.log('airline Count should be 9', ':	', airlineCount.toNumber());
+        console.log('airline Count after should be 9', ':	', airlineCount.toNumber());
 
         // funding
         for (let i = 2; i < airlineCount.toNumber(); i++) {
             await config.flightSuretyApp.fund({ from: airlines[i], value: web3.utils.toWei("10", "ether") });
         }
-        // registering
-        for (let i = 2; i < airlineCount.toNumber(); i++) {
+        regAirlineCount = await config.flightSuretyApp.getRegisteredAirlineCount();
+        console.log('reg airline Count', ':	', regAirlineCount.toNumber());
+
+        // registering before voting
+        for (let i = 2; i <= airlineCount.toNumber(); i++) {
             try {
                 await config.flightSuretyApp.registerAirline(airlines[i], { from: creatorAirline });
                 airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
@@ -281,46 +288,57 @@ contract('Flight Surety Tests', async (accounts) => {
             } catch (error) {
             }
         }
-        regairlineCount = await config.flightSuretyApp.getRegisteredAirlineCount();
-        console.log('reg airline Count should be 4', ':	', regairlineCount.toNumber());
+        // console.table(logs);
 
-        //voting
+        regAirlineCount = await config.flightSuretyApp.getRegisteredAirlineCount();
+        console.log('reg airline Count before voting should be 4', ':	', regAirlineCount.toNumber());
 
-        await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[2] })
-        await config.flightSuretyApp.voteAirline(airlines[6], { from: airlines[3] })
+        //voting 5th Airline
+        votedAirline = airlines[4]
+        await config.flightSuretyApp.voteAirline(votedAirline, { from: airlines[2] })
+        // await config.flightSuretyApp.voteAirline(votedAirline, { from: airlines[3] })
+        // await config.flightSuretyApp.voteAirline(votedAirline, { from: airlines[4] })
+        // await config.flightSuretyApp.voteAirline(votedAirline, { from: airlines[5] })
+        // await config.flightSuretyApp.voteAirline(votedAirline, { from: airlines[5] })
+
+        minVotes = await config.flightSuretyApp.getMinVotes(votedAirline);
+        console.log('minVotes', ':	', minVotes.toNumber());
+
+        voteCount = await config.flightSuretyData.getVoteCount(votedAirline);
+        console.log('voteCount', ':	', voteCount.toNumber());
+
+        // registering
+        try {
+            await config.flightSuretyApp.registerAirline(votedAirline, { from: creatorAirline });
+
+        } catch (error) {
+
+        }
+        airlineInfo = await config.flightSuretyData.getAirline(votedAirline);
+        balance = await web3.eth.getBalance(votedAirline)
+        logs = {
+            airline: `A airline 5: ${votedAirline}`,
+            isRegistered: airlineInfo[0],
+            isFunded: airlineInfo[1],
+            airlineAddress: airlineInfo[2],
+            voteCount: airlineInfo[3].toNumber(),
+            votes: airlineInfo[4].toString(),
+            balance: balance
+        }
+
+
+
+        regAirlineCount = await config.flightSuretyApp.getRegisteredAirlineCount();
+        console.log('reg airline Count after voting should be 5', ':	', regAirlineCount.toNumber());
 
         console.table(logs);
-        // // registering
-        // for (let i = 2; i < airlineCount.toNumber(); i++) {
-        //     try {
-        //         await config.flightSuretyApp.registerAirline(airlines[i], { from: airlines[1] });
-        //     } catch (error) {
-        //     }
-        // }
-        // for (let i = 0; i < airlineCount.toNumber(); i++) {
-        //     airlineInfo = await config.flightSuretyData.getAirline(airlines[i]);
-        //     balance = await web3.eth.getBalance(airlines[i])
-        //     logs = {
-        //         airline: `B airline ${i}: ${airlines[i]}`,
-        //         isRegistered: airlineInfo[0],
-        //         isFunded: airlineInfo[1],
-        //         airlineAddress: airlineInfo[2],
-        //         voteCount: airlineInfo[3].toNumber(),
-        //         votes: airlineInfo[4].toString(),
-        //         needVotes: airlineInfo[5],
-        //         balance: balance
-        //     }
-        //     console.table(logs);
-        // }
-        // try {
-        //     await config.flightSuretyApp.registerAirline(airlines[3], { from: airlines[2] });
-        // } catch (error) {
-        // }
-        // result = await config.flightSuretyData.isAirline(airlines[3]);
-        // // // ASSERT
-        // assert.equal(result, false, "Airline should not be able to register another airline if it is not existing airline");
+
+
+        result = await config.flightSuretyData.isAirline(votedAirline);
+        // ASSERT
+        assert.equal(result, false, "Airline should not be able to register another airline if it is not existing airline");
     });
-    /*
+
     it('8...Passengers can choose from a fixed list of flight, passengers may pay up to 1 ether for purchasing flight insurance.  ', async () => {
         let airlines = [];
         airlines.push(accounts[0]);
@@ -331,7 +349,6 @@ contract('Flight Surety Tests', async (accounts) => {
         airlines.push(accounts[5]);
         // airlines created
         for (let i = 0; i < airlines.length; i++) {
-
             await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
         }
         //passengers
@@ -435,172 +452,172 @@ contract('Flight Surety Tests', async (accounts) => {
 
     });
 
-
-    it('TEST ...  TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...', async () => {
-        // let airlines = [];
-        // airlines.push(accounts[0]);
-        // airlines.push(accounts[1]);
-        // airlines.push(accounts[2]);
-        // airlines.push(accounts[3]);
-        // airlines.push(accounts[4]);
-        // airlines.push(accounts[5]);
-        // for (let i = 0; i < airlines.length; i++) {
-        //     // airlines created 
-        //     await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
-        // }
-        // //passengers
-        // let passengers = []
-        // passengers.push(accounts[5])
-        // passengers.push(accounts[6])
-        // passengers.push(accounts[7])
-        // for (let i = 0; i < passengers.length; i++) {
-        //     await config.flightSuretyApp.createPassenger(passengers[i])
-        // }
-        // console.log('passengers:');
-        // console.log(await config.flightSuretyApp.getPassengersAdresses());
-        // //flights of airline 2
-        // for (let i = 1; i <= 3; i++) {
-        //     await config.flightSuretyApp.createFlight('F00' + i, Math.floor(Date.now() / 1000, 0), airlines[2])
-        // }
-        // console.log('flights:');
-        // // console.log(await config.flightSuretyApp.getFlights());
-        // let flights = await config.flightSuretyApp.getFlights();
-        // for (let i = 0; i < flights.length; i++) {
-        //     console.log(await config.flightSuretyApp.getFlight(flights[i]));
-        // }
-        // // purchasing flights
-        // let passenger = passengers[1];
-        // let flight = flights[1];
-        // //to purchase flight passenger should send 1 eth
-        // await config.flightSuretyApp.buy(flight, { from: passenger, value: web3.utils.toWei("1", "ether") });
-        // flightInfo = await config.flightSuretyApp.getFlight(flight)
-        // // when flight status changed 
-        // //flights of airline 2
-        // // address airline,
-        // // string flight,
-        // // uint256 timestamp    
-        // // let status = await config.flightSuretyApp.fetchFlightStatus(airlines[1], "F00XYZ", Math.floor(Date.now() / 1000, 0))
-
-        // // let fee = await config.flightSuretyApp.REGISTRATION_FEE.call();
-
-        // // for (let a = 1; a < 10; a++) {
-        // //     await config.flightSuretyApp.registerOracle({ from: accounts[0], value: fee });
-        // // }
-
-
-
-
-
-        // // ARRANGE
-        // flight = 'F000XYZ'; // Course number
-        // let timestamp = Math.floor(Date.now() / 1000);
-
-        // // Submit a request for oracles to get status information for a flight
-        // await config.flightSuretyApp.fetchFlightStatus(accounts[0], flight, timestamp);
-
-        // // ACT
-
-        // // Since the Index assigned to each test account is opaque by design
-        // // loop through all the accounts and for each account, all its Indexes (indices?)
-        // // and submit a response. The contract will reject a submission if it was
-        // // not requested so while sub-optimal, it's a good test of that feature
-
-        // for (let a = 1; a < TEST_ORACLES_COUNT; a++) {
-
-        //     // Get oracle information
-        //     // For a real contract, we would not want to have this capability
-        //     // so oracles can remain secret (at least to the extent one doesn't look
-        //     // in the blockchain data)
-
-        //     await config.flightSuretyApp.registerOracle({ from: accounts[a], value: fee });
-
-        //     let oracleIndexes = await config.flightSuretyApp.getOracle(accounts[a]);
-
-        //     console.log(`Oracle registered account${accounts[a]}: ${result[0]} ${result[1]} ${result[2]}`);
-
-        //     for (let idx = 0; idx < 3; idx++) {
-
-        //         try {
-        //             // Submit a response...it will only be accepted if there is an Index match
-        //             await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx], flight, timestamp, 10, { from: accounts[a] });
-
-        //             // Check to see if flight status is available
-        //             // Only useful while debugging since flight status is not hydrated until a 
-        //             // required threshold of oracles submit a response
-        //             let flightStatus = await config.flightSuretyApp.viewFlightStatus(flight, timestamp);
-        //             // console.log(1111);
-        //             console.log('\nPost', idx, oracleIndexes[idx].toNumber(), flight, timestamp, flightStatus);
-        //             // console.log(2222);
-        //         }
-        //         catch (e) {
-        //             // Enable this when debugging
-        //             // console.log('\nError', idx, oracleIndexes[idx].toNumber(), flight, timestamp);
-        //         }
-
-        //     }
-        // }
-
-        // let airlines = [];
-        // airlines.push(accounts[0]);
-        // airlines.push(accounts[1]);
-        // airlines.push(accounts[2]);
-        // airlines.push(accounts[3]);
-        // airlines.push(accounts[4]);
-        // airlines.push(accounts[5]);
-        // // airlines created
-        // for (let i = 0; i < airlines.length; i++) {
-
-        //     await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
-        // }
-        // //passengers
-        // let passengers = []
-        // passengers.push(accounts[5])
-        // passengers.push(accounts[6])
-        // passengers.push(accounts[7])
-        // // passengers created
-        // for (let i = 0; i < passengers.length; i++) {
-        //     await config.flightSuretyApp.createPassenger(passengers[i])
-        // }
-        // console.log('passengers:');
-        // console.log(await config.flightSuretyApp.getPassengersAdresses());
-        // //flights of airline 2
-        // for (let i = 1; i <= 3; i++) {
-        //     await config.flightSuretyApp.createFlight('F00' + i, Math.floor(Date.now() / 1000, 0), airlines[2])
-        // }
-        // let flights = await config.flightSuretyApp.getFlights();
-        // // purchasing flights
-        // let passenger = passengers[1];
-        // let flight = flights[1];
-        // console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
-        // //to purchase flight passenger should send 1 eth
-        // await config.flightSuretyApp.buy(flight, { from: passenger, value: web3.utils.toWei("1", "ether") });
-        // flightInfo = await config.flightSuretyApp.getFlight(flight)
-        // // bool isRegistered;
-        // // uint8 statusCode;
-        // // string flightName;
-        // // uint256 updatedTimestamp;        
-        // // address airline;
-        // // bool isInsured;
-        // logs = {
-        //     isRegistered: flightInfo[0],
-        //     statusCode: flightInfo[1],
-        //     flightName: flightInfo[2],
-        //     updatedTimestamp: flightInfo[3],
-        //     airline: flightInfo[4],
-        //     isInsured: flightInfo[5]
-        // }
-        // console.table(logs);
-        // console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
-    });
-    /* START COMMENT  
-        ////----------------------
-       // ==============> (((  6  ))) <==============
+    /*
+        it('TEST ...  TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...TEST ...', async () => {
+            // let airlines = [];
+            // airlines.push(accounts[0]);
+            // airlines.push(accounts[1]);
+            // airlines.push(accounts[2]);
+            // airlines.push(accounts[3]);
+            // airlines.push(accounts[4]);
+            // airlines.push(accounts[5]);
+            // for (let i = 0; i < airlines.length; i++) {
+            //     // airlines created 
+            //     await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
+            // }
+            // //passengers
+            // let passengers = []
+            // passengers.push(accounts[5])
+            // passengers.push(accounts[6])
+            // passengers.push(accounts[7])
+            // for (let i = 0; i < passengers.length; i++) {
+            //     await config.flightSuretyApp.createPassenger(passengers[i])
+            // }
+            // console.log('passengers:');
+            // console.log(await config.flightSuretyApp.getPassengersAdresses());
+            // //flights of airline 2
+            // for (let i = 1; i <= 3; i++) {
+            //     await config.flightSuretyApp.createFlight('F00' + i, Math.floor(Date.now() / 1000, 0), airlines[2])
+            // }
+            // console.log('flights:');
+            // // console.log(await config.flightSuretyApp.getFlights());
+            // let flights = await config.flightSuretyApp.getFlights();
+            // for (let i = 0; i < flights.length; i++) {
+            //     console.log(await config.flightSuretyApp.getFlight(flights[i]));
+            // }
+            // // purchasing flights
+            // let passenger = passengers[1];
+            // let flight = flights[1];
+            // //to purchase flight passenger should send 1 eth
+            // await config.flightSuretyApp.buy(flight, { from: passenger, value: web3.utils.toWei("1", "ether") });
+            // flightInfo = await config.flightSuretyApp.getFlight(flight)
+            // // when flight status changed 
+            // //flights of airline 2
+            // // address airline,
+            // // string flight,
+            // // uint256 timestamp    
+            // // let status = await config.flightSuretyApp.fetchFlightStatus(airlines[1], "F00XYZ", Math.floor(Date.now() / 1000, 0))
     
-       // ==============> (((  8  ))) <==============
-       // 8...passengers can buy insurance
-       // ==============> (((  9  ))) <==============
-       // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
-       // ==============> (((  10  ))) <==============
-       // 10...passengers can withdraw the ether that they were credited!
-        */
+            // // let fee = await config.flightSuretyApp.REGISTRATION_FEE.call();
+    
+            // // for (let a = 1; a < 10; a++) {
+            // //     await config.flightSuretyApp.registerOracle({ from: accounts[0], value: fee });
+            // // }
+    
+    
+    
+    
+    
+            // // ARRANGE
+            // flight = 'F000XYZ'; // Course number
+            // let timestamp = Math.floor(Date.now() / 1000);
+    
+            // // Submit a request for oracles to get status information for a flight
+            // await config.flightSuretyApp.fetchFlightStatus(accounts[0], flight, timestamp);
+    
+            // // ACT
+    
+            // // Since the Index assigned to each test account is opaque by design
+            // // loop through all the accounts and for each account, all its Indexes (indices?)
+            // // and submit a response. The contract will reject a submission if it was
+            // // not requested so while sub-optimal, it's a good test of that feature
+    
+            // for (let a = 1; a < TEST_ORACLES_COUNT; a++) {
+    
+            //     // Get oracle information
+            //     // For a real contract, we would not want to have this capability
+            //     // so oracles can remain secret (at least to the extent one doesn't look
+            //     // in the blockchain data)
+    
+            //     await config.flightSuretyApp.registerOracle({ from: accounts[a], value: fee });
+    
+            //     let oracleIndexes = await config.flightSuretyApp.getOracle(accounts[a]);
+    
+            //     console.log(`Oracle registered account${accounts[a]}: ${result[0]} ${result[1]} ${result[2]}`);
+    
+            //     for (let idx = 0; idx < 3; idx++) {
+    
+            //         try {
+            //             // Submit a response...it will only be accepted if there is an Index match
+            //             await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx], flight, timestamp, 10, { from: accounts[a] });
+    
+            //             // Check to see if flight status is available
+            //             // Only useful while debugging since flight status is not hydrated until a 
+            //             // required threshold of oracles submit a response
+            //             let flightStatus = await config.flightSuretyApp.viewFlightStatus(flight, timestamp);
+            //             // console.log(1111);
+            //             console.log('\nPost', idx, oracleIndexes[idx].toNumber(), flight, timestamp, flightStatus);
+            //             // console.log(2222);
+            //         }
+            //         catch (e) {
+            //             // Enable this when debugging
+            //             // console.log('\nError', idx, oracleIndexes[idx].toNumber(), flight, timestamp);
+            //         }
+    
+            //     }
+            // }
+    
+            // let airlines = [];
+            // airlines.push(accounts[0]);
+            // airlines.push(accounts[1]);
+            // airlines.push(accounts[2]);
+            // airlines.push(accounts[3]);
+            // airlines.push(accounts[4]);
+            // airlines.push(accounts[5]);
+            // // airlines created
+            // for (let i = 0; i < airlines.length; i++) {
+    
+            //     await config.flightSuretyData.createAirline(airlines[i], { from: airlines[1] });
+            // }
+            // //passengers
+            // let passengers = []
+            // passengers.push(accounts[5])
+            // passengers.push(accounts[6])
+            // passengers.push(accounts[7])
+            // // passengers created
+            // for (let i = 0; i < passengers.length; i++) {
+            //     await config.flightSuretyApp.createPassenger(passengers[i])
+            // }
+            // console.log('passengers:');
+            // console.log(await config.flightSuretyApp.getPassengersAdresses());
+            // //flights of airline 2
+            // for (let i = 1; i <= 3; i++) {
+            //     await config.flightSuretyApp.createFlight('F00' + i, Math.floor(Date.now() / 1000, 0), airlines[2])
+            // }
+            // let flights = await config.flightSuretyApp.getFlights();
+            // // purchasing flights
+            // let passenger = passengers[1];
+            // let flight = flights[1];
+            // console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
+            // //to purchase flight passenger should send 1 eth
+            // await config.flightSuretyApp.buy(flight, { from: passenger, value: web3.utils.toWei("1", "ether") });
+            // flightInfo = await config.flightSuretyApp.getFlight(flight)
+            // // bool isRegistered;
+            // // uint8 statusCode;
+            // // string flightName;
+            // // uint256 updatedTimestamp;        
+            // // address airline;
+            // // bool isInsured;
+            // logs = {
+            //     isRegistered: flightInfo[0],
+            //     statusCode: flightInfo[1],
+            //     flightName: flightInfo[2],
+            //     updatedTimestamp: flightInfo[3],
+            //     airline: flightInfo[4],
+            //     isInsured: flightInfo[5]
+            // }
+            // console.table(logs);
+            // console.log('balance 1', ':	', await web3.eth.getBalance(passenger));
+        });
+        /* START COMMENT  
+            ////----------------------
+           // ==============> (((  6  ))) <==============
+        
+           // ==============> (((  8  ))) <==============
+           // 8...passengers can buy insurance
+           // ==============> (((  9  ))) <==============
+           // 9...passenger get paid 1.5X what they paid if flight delayed (CODE 20)
+           // ==============> (((  10  ))) <==============
+           // 10...passengers can withdraw the ether that they were credited!
+            */
 });
