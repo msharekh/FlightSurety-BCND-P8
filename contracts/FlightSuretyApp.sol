@@ -165,6 +165,9 @@ contract FlightSuretyApp {
     public
     payable
     {
+         // require(msg.value>= 2000000000000000000, "Airline does not have engough fund");
+        require(msg.value>= 10 ether , "Airline does not have engough fund");
+        //this is transfering fund from airline to contract app then to data
         flightSuretyData.fund.value(msg.value)(msg.sender);     
         // flightSuretyData.call.value(msg.value);  
     }
@@ -250,8 +253,14 @@ contract FlightSuretyApp {
         flights[flightKey].isRefunded = true;
         flights[flightKey].refundAmount = msg.value;
 
-        flightSuretyData.creditInsurees(_address);
+        // flightSuretyData.creditInsurees(_address);
+
+                        _address.transfer(msg.value);   
+
     }
+
+     
+
 
     function withdraw
     (      

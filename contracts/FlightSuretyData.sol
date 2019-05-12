@@ -244,6 +244,9 @@ modifier requireIsFunded(address _address) {
      {
             // insuree.send(msg.value);
             refundedBalance[insuree]=refundAmount;
+            
+            // insuree.fund.value(msg.value)(msg.sender);     
+
      }
 
      function withdraw
@@ -254,7 +257,7 @@ modifier requireIsFunded(address _address) {
      external
      payable
      {
-         insuree.send(msg.value);
+        //  insuree.send(msg.value);
      }
     /**
      *  @dev Transfers eligible payout funds to insuree
@@ -270,6 +273,9 @@ modifier requireIsFunded(address _address) {
      {
          // insuree.send(msg.value);
         refundedBalance[insuree]=refundAmount;
+
+            // _receiver.send(msg.value);
+
      }
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights
@@ -283,8 +289,7 @@ modifier requireIsFunded(address _address) {
     public
     payable
     {
-        // require(msg.value>= 2000000000000000000, "Airline does not have engough fund");
-        require(msg.value>= 10 ether , "Airline does not have engough fund");
+       
         airlines[_address].isFunded=true;
     }
     function getSentAddress() external view returns(address) {
